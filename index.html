@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modificar datos del evento - Showtech Solutions</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Encabezado Showtech Solutions -->
+  <header>
+    <div class="marca">SHOWTECH <span>SOLUTIONS</span></div>
+    <div class="header-der">
+      <span class="usuario">Usuario: Asesor(a) comercial</span>
+      <button type="button" class="btn-demo" id="btnResetDemo" title="Restablecer datos originales de prueba">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+        <span>Restablecer demo</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="encabezado-seccion">
+      <div>
+        <h1>Modificar datos del evento</h1>
+        <p class="sub">Actualice la información del evento, verifique la disponibilidad del auditorio y confirme los cambios en el sistema.</p>
+      </div>
+      <div class="aviso-demo-tag">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        <span>Demostración: cambios guardados en este navegador</span>
+      </div>
+    </div>
+
+    <!-- Barra de 4 Pasos -->
+    <div class="pasos" role="tablist">
+      <div class="paso clic activo" id="p1" onclick="irPaso(1)" role="tab" aria-selected="true">
+        <span class="num">1</span>Seleccionar evento
+      </div>
+      <div class="paso clic" id="p2" onclick="irPaso(2)" role="tab" aria-selected="false">
+        <span class="num">2</span>Modificar datos
+      </div>
+      <div class="paso clic" id="p3" onclick="irPaso(3)" role="tab" aria-selected="false">
+        <span class="num">3</span>Validar disponibilidad
+      </div>
+      <div class="paso clic" id="p4" onclick="irPaso(4)" role="tab" aria-selected="false">
+        <span class="num">4</span>Revisar y confirmar
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         PASO 1: SELECCIONAR EVENTO
+         ===================================================================== -->
+    <section class="tarjeta" id="s1">
+      <h2>1. Seleccionar evento registrado</h2>
+      <div id="avisoPaso1"></div>
+
+      <div class="barra">
+        <input type="text" class="buscador" id="buscar" placeholder="Buscar por código, cliente o nombre del evento...">
+        <div class="contador-eventos" id="contadorEventos">2 eventos registrados</div>
+      </div>
+
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Cliente</th>
+              <th>Evento</th>
+              <th>Fecha</th>
+              <th>Horario del evento</th>
+              <th>Tiempos técnicos</th>
+              <th>Estado</th>
+              <th class="num-der">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaEventos">
+            <!-- Filas inyectadas por JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="banner-seleccionado" id="bannerSeleccionado">
+        <div class="banner-texto">
+          <small>Evento cargado actualmente para edición:</small>
+          <strong id="bannerTextoEvento">EVT-001 &bull; Ceremonia de graduación (Promoción Horizonte 2026)</strong>
+        </div>
+        <button type="button" class="btn btn-primario" onclick="irPaso(2)">
+          Continuar con este evento &rarr;
+        </button>
+      </div>
+
+      <p class="nota-ejemplo">* Haga clic en "Seleccionar" en la tabla para cargar cualquier evento en el formulario.</p>
+    </section>
+
+    <!-- =====================================================================
+         PASO 2: MODIFICAR DATOS
+         ===================================================================== -->
+    <section class="tarjeta oculto" id="s2">
+      <div class="tarjeta-cabecera-flex">
+        <h2>2. Modificar datos del evento</h2>
+        <div class="etiqueta et-evento-activo" id="badgeEventoPaso2">EVT-001 &bull; Confirmado</div>
+      </div>
+
+      <form id="formModificarEvento" novalidate onsubmit="return false;">
+        
+        <!-- Bloque 1: Información General y Contacto -->
+        <h3>Información general y contacto</h3>
+        <div class="form">
+          <div>
+            <label for="eventCode">Código del evento</label>
+            <input type="text" id="eventCode" readonly>
+            <span class="ayuda">Identificador del evento (solo lectura).</span>
+          </div>
+
+          <div>
+            <label for="eventSpace">Auditorio asignado</label>
+            <input type="text" id="eventSpace" value="Auditorio Showtech" readonly>
+            <span class="ayuda">Espacio institucional (solo lectura).</span>
+          </div>
+
+          <div class="completo">
+            <label for="eventName">
+              Nombre de la convocatoria o evento <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventName">Modificado</span>
+            </label>
+            <input type="text" id="eventName" required maxlength="120" placeholder="Ej. Ceremonia de graduación">
+            <span class="msg-error-campo" id="errEventName"></span>
+          </div>
+
+          <div>
+            <label for="eventClient">
+              Cliente (nombre o razón social) <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventClient">Modificado</span>
+            </label>
+            <input type="text" id="eventClient" required maxlength="100" placeholder="Ej. Promoción Horizonte 2026">
+            <span class="msg-error-campo" id="errEventClient"></span>
+          </div>
+
+          <div>
+            <label for="eventContact">
+              Persona de contacto <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventContact">Modificado</span>
+            </label>
+            <input type="text" id="eventContact" required maxlength="80" placeholder="Nombre y celular">
+            <span class="msg-error-campo" id="errEventContact"></span>
+          </div>
+
+          <div>
+            <label for="eventPhone">
+              Teléfono de contacto
+              <span class="mod-pill" id="modBadgeEventPhone">Modificado</span>
+            </label>
+            <input type="tel" id="eventPhone" maxlength="25" placeholder="Ej. 998 765 432">
+          </div>
+
+          <div>
+            <label for="eventEmail">
+              Correo electrónico
+              <span class="mod-pill" id="modBadgeEventEmail">Modificado</span>
+            </label>
+            <input type="email" id="eventEmail" maxlength="80" placeholder="Ej. contacto@cliente.com">
+          </div>
+
+          <div class="completo">
+            <label for="requestedBy">
+              Cambio solicitado por <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeRequestedBy">Modificado</span>
+            </label>
+            <select id="requestedBy" required>
+              <option value="Cliente">Cliente</option>
+              <option value="Asesor comercial">Asesor comercial</option>
+            </select>
+            <span class="ayuda">Canal de origen de la solicitud de modificación.</span>
+          </div>
+
+          <div class="completo">
+            <label for="eventNotes">
+              Observaciones y requerimientos técnicos <span class="opc">(opcional)</span>
+              <span class="mod-pill" id="modBadgeEventNotes">Modificado</span>
+            </label>
+            <textarea id="eventNotes" rows="2" maxlength="300" placeholder="Requerimientos de audio, micrófonos, pantalla LED, distribución, etc."></textarea>
+          </div>
+        </div>
+
+        <!-- Bloque 2: Fecha y Horario del Evento -->
+        <h3>Fecha y horario del evento</h3>
+        <div class="form">
+          <div>
+            <label for="eventDate">
+              Fecha del evento <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventDate">Modificado</span>
+            </label>
+            <input type="date" id="eventDate" required>
+            <span class="msg-error-campo" id="errEventDate"></span>
+          </div>
+
+          <div>
+            <label for="eventStartTime">
+              Hora de inicio del evento <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventStartTime">Modificado</span>
+            </label>
+            <input type="time" id="eventStartTime" min="06:00" max="22:00" required>
+            <span class="msg-error-campo" id="errEventStartTime"></span>
+          </div>
+
+          <div>
+            <label for="eventEndTime">
+              Hora de fin del evento <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventEndTime">Modificado</span>
+            </label>
+            <input type="time" id="eventEndTime" min="06:00" max="22:00" required>
+            <span class="msg-error-campo" id="errEventEndTime"></span>
+          </div>
+        </div>
+        <p class="ayuda" style="margin-top: 6px;">* Horario regular de funcionamiento del auditorio: 06:00 a 22:00. Evento, montaje y desmontaje deben ocurrir el mismo día.</p>
+
+        <!-- Bloque 3: Tiempos Adicionales Independientes -->
+        <h3>Tiempos técnicos adicionales (independientes)</h3>
+        <div class="grid-adicionales">
+
+          <!-- Montaje Independiente -->
+          <div class="caja-adicional" id="panelMontaje">
+            <label class="check-label" for="chkMontaje">
+              <input type="checkbox" id="chkMontaje">
+              <span>Requiere montaje previo</span>
+            </label>
+            <div class="campos-adicional oculto" id="fieldsMontaje">
+              <label for="montajeStartTime">
+                Hora de inicio del montaje <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeMontajeStart">Modificado</span>
+              </label>
+              <input type="time" id="montajeStartTime" min="06:00" max="22:00">
+              <span class="ayuda">Finaliza automáticamente al comenzar el evento (mismo día).</span>
+              <span class="msg-error-campo" id="errMontajeStart"></span>
+            </div>
+          </div>
+
+          <!-- Desmontaje Independiente -->
+          <div class="caja-adicional" id="panelDesmontaje">
+            <label class="check-label" for="chkDesmontaje">
+              <input type="checkbox" id="chkDesmontaje">
+              <span>Requiere desmontaje posterior</span>
+            </label>
+            <div class="campos-adicional oculto" id="fieldsDesmontaje">
+              <label for="desmontajeEndTime">
+                Hora de fin del desmontaje <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeDesmontajeEnd">Modificado</span>
+              </label>
+              <input type="time" id="desmontajeEndTime" min="06:00" max="22:00">
+              <span class="ayuda">Inicia automáticamente al finalizar el evento (mismo día).</span>
+              <span class="msg-error-campo" id="errDesmontajeEnd"></span>
+            </div>
+          </div>
+
+          <!-- Ensayo Técnico Previo -->
+          <div class="caja-adicional completo" id="panelEnsayo">
+            <label class="check-label" for="chkEnsayo">
+              <input type="checkbox" id="chkEnsayo">
+              <span>Requiere ensayo técnico previo</span>
+            </label>
+            <div class="campos-adicional oculto" id="fieldsEnsayo">
+              <div class="form">
+                <div>
+                  <label for="ensayoDate">
+                    Fecha del ensayo <span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeEnsayoDate">Modificado</span>
+                  </label>
+                  <input type="date" id="ensayoDate">
+                  <span class="msg-error-campo" id="errEnsayoDate"></span>
+                </div>
+                <div>
+                  <label for="ensayoStartTime">
+                    Hora inicio del ensayo <span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeEnsayoStart">Modificado</span>
+                  </label>
+                  <input type="time" id="ensayoStartTime" min="06:00" max="22:00">
+                  <span class="msg-error-campo" id="errEnsayoStart"></span>
+                </div>
+                <div>
+                  <label for="ensayoEndTime">
+                    Hora fin del ensayo <span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeEnsayoEnd">Modificado</span>
+                  </label>
+                  <input type="time" id="ensayoEndTime" min="06:00" max="22:00">
+                  <span class="msg-error-campo" id="errEnsayoEnd"></span>
+                </div>
+              </div>
+              <span class="ayuda">El ensayo debe finalizar antes del evento y no cruzarse con su montaje ni con otros eventos.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Cronograma resumido del horario propuesto -->
+        <div class="resumen-horario-box" id="resumenHorarioBox">
+          <div class="resumen-horario-titulo">Cronograma propuesto:</div>
+          <div class="resumen-horario-items" id="resumenHorarioItems"></div>
+        </div>
+
+        <div class="msg-error" id="errorPaso2"></div>
+
+        <!-- Acciones del Paso 2 -->
+        <div class="acciones">
+          <button type="button" class="btn btn-sec" onclick="irPaso(1)">&larr; Volver a la lista</button>
+          
+          <div class="der">
+            <button type="button" class="btn btn-sec" id="btnDescartarPaso2">
+              Descartar cambios
+            </button>
+            <button type="button" class="btn btn-ok oculto" id="btnDirectoRevision" onclick="irPaso(4)">
+              Revisar y confirmar directo &rarr;
+            </button>
+            <button type="button" class="btn btn-primario" id="btnAvanzarPaso2">
+              Validar disponibilidad &rarr;
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- =====================================================================
+         PASO 3: VALIDAR DISPONIBILIDAD
+         ===================================================================== -->
+    <section class="tarjeta oculto" id="s3">
+      <h2>3. Validar disponibilidad de horarios</h2>
+      
+      <h3>Horario propuesto para validación en auditorio</h3>
+      <div class="grid" id="detalleHorarioValidar">
+        <!-- Renderizado dinámicamente -->
+      </div>
+
+      <div class="acciones-validacion">
+        <button type="button" class="btn btn-primario" id="btnCheckAvailability">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          Comprobar disponibilidad en auditorio
+        </button>
+      </div>
+
+      <!-- Cuadro de Resultado de Disponibilidad -->
+      <div class="aviso aviso-info" id="availabilityFeedback">
+        <div class="aviso-titulo" id="feedbackTitle">Pendiente de verificar</div>
+        <div id="feedbackMessage">Haga clic en el botón superior para comprobar posibles cruces con otros eventos y bloqueos institucionales.</div>
+        <ul id="feedbackDetails" class="feedback-lista oculto"></ul>
+      </div>
+
+      <!-- Sugerencias de Horarios Alternativos (ante colisión) -->
+      <div class="sugerencias-box oculto" id="scheduleSuggestionsContainer">
+        <h4>Horarios alternativos disponibles para el mismo día</h4>
+        <p class="ayuda">Se conservan las duraciones solicitadas del evento, montaje y desmontaje en bloques cada 30 minutos (06:00 a 22:00):</p>
+        <div class="sugerencias-grid" id="suggestionsList"></div>
+      </div>
+
+      <!-- Acciones del Paso 3 -->
+      <div class="acciones">
+        <button type="button" class="btn btn-sec" onclick="irPaso(2)">&larr; Modificar datos</button>
+        <div class="der">
+          <button type="button" class="btn btn-primario" id="btnContinuarPaso4" disabled>
+            Continuar a revisión y confirmación &rarr;
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         PASO 4: REVISAR Y CONFIRMAR
+         ===================================================================== -->
+    <section class="tarjeta oculto" id="s4">
+      <h2>4. Revisar y confirmar modificaciones</h2>
+      <div id="avisoFinal"></div>
+
+      <!-- 4a: Vista de Revisión (Diff + Comprobante preliminar) -->
+      <div id="vistaRevision">
+        <div class="aviso aviso-info">
+          Revise el resumen de diferencias respecto a los datos registrados antes de confirmar. Puede ingresar un motivo de modificación para auditoría interna.
+        </div>
+
+        <!-- Tabla de Diferencias (Diff) -->
+        <h3>Resumen de cambios (Diferencias detectadas)</h3>
+        <div class="tabla-wrap" id="diffTableContainer"></div>
+
+        <!-- Ficha / Comprobante de Modificación -->
+        <h3>Comprobante de modificación del evento</h3>
+        <div class="comprobante" id="comprobante"></div>
+
+        <!-- Motivo de la modificación opcional -->
+        <div class="form" style="margin-top: 16px;">
+          <div class="completo">
+            <label for="modificationReason">
+              Motivo de la modificación <span class="opc">(opcional para auditoría)</span>
+            </label>
+            <textarea id="modificationReason" rows="2" placeholder="Ej. Solicitud de ajuste de horario por parte del cliente debido a retraso de vuelos..."></textarea>
+          </div>
+        </div>
+
+        <div class="msg-error" id="errorPaso4"></div>
+
+        <div class="acciones" id="accionesRevision">
+          <button type="button" class="btn btn-sec" onclick="irPaso(2)">&larr; Volver a editar</button>
+          <div class="der">
+            <button type="button" class="btn btn-sec" id="btnDescartarFinal">Descartar cambios</button>
+            <button type="button" class="btn btn-ok" id="btnConfirmSave">
+              Confirmar y guardar cambios
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4b: Vista de Confirmación Exitosa Final -->
+      <div id="vistaExito" class="oculto">
+        <div class="comprobante final" id="comprobanteFinal"></div>
+        <div class="acciones">
+          <button type="button" class="btn btn-sec" onclick="window.print()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
+            </svg>
+            Imprimir comprobante
+          </button>
+          <div class="der">
+            <button type="button" class="btn btn-sec" onclick="reiniciar(1)">Volver a la lista de eventos</button>
+            <button type="button" class="btn btn-primario" onclick="reiniciar(2)">Continuar editando este evento</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Historial de Auditoría del Evento -->
+    <details class="tarjeta" id="secHistorial">
+      <summary class="historial-toggle">
+        <span>Historial de auditoría de este evento (<span id="countHistorial">0</span> modificaciones registradas)</span>
+      </summary>
+      <div class="historial-contenido" id="historyListContainer"></div>
+    </details>
+
+  </main>
+
+  <!-- =====================================================================
+       MODALES
+       ===================================================================== -->
+
+  <!-- Modal de Confirmación para Descartar Cambios -->
+  <div class="modal-overlay oculto" id="confirmDiscardModal" role="dialog" aria-modal="true" aria-labelledby="modalDiscardTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalDiscardTitle">¿Descartar modificaciones?</h3>
+        <button type="button" class="modal-close-btn" id="btnCloseDiscardModal" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="discardModalMessage">Tiene modificaciones pendientes que aún no se han guardado. Si descarta los cambios, se restaurarán los valores registrados en el sistema.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sec" id="btnStayOnForm">Continuar editando</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmDiscard">Descartar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación para Restablecer Demostración -->
+  <div class="modal-overlay oculto" id="confirmResetModal" role="dialog" aria-modal="true" aria-labelledby="modalResetTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalResetTitle">Restablecer datos de demostración</h3>
+        <button type="button" class="modal-close-btn" id="btnCloseResetModal" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Esta acción restablecerá los registros de fábrica para EVT-001 (Ceremonia de graduación) y EVT-002 (Encuentro de docentes) en el Auditorio Showtech.</p>
+        <p style="margin-top: 8px; font-weight: bold; color: var(--error);">¿Desea restaurar los datos iniciales de demo?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sec" id="btnCancelResetModal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmResetDemo">Sí, restablecer datos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para Notificaciones Toast Flotantes -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
