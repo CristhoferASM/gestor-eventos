@@ -1,9 +1,9 @@
 # SHOWTECH SOLUTIONS &bull; Módulo “Modificar datos del evento”
 ### Gestión Operativa de Auditorio &bull; Panel de Administración
 
-Este proyecto implementa el prototipo funcional y de diseño del módulo administrativo **“Modificar datos del evento”** para el **Auditorio Showtech**, adaptado visual y estructuralmente con base en los estándares corporativos de **Showtech Solutions** y el flujo guiado en cuatro pasos.
+Este proyecto implementa el prototipo funcional y de diseño del módulo administrativo **“Modificar datos del evento”** para el **Auditorio Showtech**, adaptado visual y estructuralmente con base en la identidad corporativa de **Showtech Solutions S.A.C.** y el flujo guiado en cuatro pasos.
 
-Desarrollado con **HTML5 semántico, CSS3 y JavaScript puro (Vanilla JS / ES6+)**, sin frameworks, sin librerías de terceros y con persistencia en `localStorage`.
+Desarrollado con **HTML5 semántico, CSS3 y JavaScript puro (Vanilla JS / ES6+)**, incorporando localmente **Flatpickr (v4.6.13)** con localización en español y **jsPDF (v2.5.1)** para la generación del resumen formal para el cliente, sin dependencias de Node en tiempo de ejecución, compatible con apertura directa de archivos locales (`file://`), servidores estáticos y GitHub Pages.
 
 ---
 
@@ -11,64 +11,152 @@ Desarrollado con **HTML5 semántico, CSS3 y JavaScript puro (Vanilla JS / ES6+)*
 
 - **Paleta de marca corporativa:**
   - Azul marino principal: `#13264a`
-  - Azul secundario: `#1f4e9c`
+  - Azul secundario Showtech: `#1f4e9c`
   - Dorado de acento: `#f2a900`
   - Fondo general: `#f5f7fb`
   - Lavanda suave: `#eef1fb`
   - Verde de confirmación / éxito: `#1e8e5a`
   - Rojo de error / conflicto: `#c0392b`
-- **Tipografía y acabados:**
-  - Familia tipográfica limpia: `Arial, Helvetica, sans-serif`.
-  - Tarjetas blancas estructuradas (`#ffffff`) con bordes suaves (`#d9deea`) y esquinas redondeadas (8–10 px).
-  - Iconos vectoriales SVG limpios con dimensiones explícitas normalizadas (18–24 px).
-  - Sin menús de módulos inexistentes ni elementos decorativos innecesarios.
-  - Diseño totalmente adaptable (responsive) para escritorio, tablet y dispositivos móviles.
+- **Identificación visual de bloques técnicos (Colores suaves y etiquetas legibles):**
+  - **Evento principal:** Azul Showtech (`#1f4e9c` / fondo suave `#eff6ff`) &bull; Etiqueta `badge-evento`.
+  - **Montaje técnico:** Ámbar (`#d97706` / fondo suave `#fef3c7`) &bull; Etiqueta `badge-montaje`.
+  - **Desmontaje técnico:** Violeta (`#7c3aed` / fondo suave `#f3e8ff`) &bull; Etiqueta `badge-desmontaje`.
+  - **Ensayo técnico:** Turquesa (`#0d9488` / fondo suave `#ccfbf1`) &bull; Etiqueta `badge-ensayo`.
+  - No depende exclusivamente del color: cada bloque cuenta con encabezados textuales explícitos, ayudas contextuales y etiquetas semánticas.
 
 ---
 
-## 2. Organización del Módulo en Cuatro Pasos
+## 2. Ajustes Implementados
 
-El flujo de trabajo se organiza en una barra superior interactiva de cuatro fases secuenciales:
+### 1. Selector de Hora Más Claro (Flatpickr Rediseñado)
+- **Campo único HH:mm con icono de reloj:** Se eliminaron los antiguos desplegables dobles voluminosos. Cada horario se muestra en un campo estilizado con esquinas redondeadas de 8 px, fondo blanco, borde gris suave y foco azul Showtech.
+- **Panel flotante amplio y ergonómico:** Panel rediseñado con padding generoso (16 px), etiquetas textuales superiores **“Hora”** y **“Minutos”**, separador `:`, números grandes (20 px) y controles de flecha cómodos para pulsación táctil o con cursor.
+- **Acción clara “Listo”:** Se añadió un botón inferior `.btn-fp-listo` dentro del propio panel para cerrar cómodamente la selección con un clic.
+- **Entrada manual y teclado:** Permite escribir directamente la hora con formato de 24 horas y precisión de 1 minuto. La validación en fase de captura no corrige silenciosamente horas inválidas: si se introduce una hora fuera del rango (`06:00` a `22:00`), se marca en rojo y muestra el mensaje correspondiente sin alteración forzada.
+
+### 2. Calendario Visual Uniforme (Flatpickr en Español)
+- **Localización nativa en español (`assets/vendor/flatpickr/es.js`):** Calendario con nombres de meses y días en español, iniciando la semana en día **Lunes** (`firstDayOfWeek: 1`).
+- **Encabezado y navegación clara:** Visualización clara de mes y año con botones ergonómicos de navegación anterior y siguiente.
+- **Días y objetivos táctiles cómodos:** Celdas de 36 px de alto con áreas cómodas para pulsar.
+- **Estados visuales diferenciados:**
+  - **Día seleccionado:** Fondo azul Showtech (`#1f4e9c`) con texto blanco y esquinas redondeadas.
+  - **Día actual (Today):** Borde discreto azul Showtech (`1.5px solid #1f4e9c`), fondo transparente y texto destacado, claramente distinguible del día seleccionado.
+- **Formato visible e interno:** Configurado con `altInput: true` y `altFormat: 'd/m/Y'`, mostrando la fecha visible en formato peruano (`dd/mm/aaaa`) mientras el valor interno mantiene compatibilidad total en formato ISO (`YYYY-MM-DD`).
+- **Icono interactivo:** Icono de calendario integrado a la derecha que despliega el selector tanto en escritorio como en móvil.
+
+### 3. Fechas y Horarios Técnicos Completos
+- **Bloques técnicos independientes:** Cada bloque (Montaje, Desmontaje y Ensayo) cuenta con casillas de activación independientes y contiene:
+  - **Fecha del bloque** (con selector de calendario Flatpickr).
+  - **Hora de inicio** (con selector de hora HH:mm).
+  - **Hora de fin** (con selector de hora HH:mm).
+- **Precarga sin alterar eventos guardados:** Al cargar los eventos iniciales (`EVT-001` y `EVT-002`), se precargan sus intervalos completos sin modificar la información de fábrica.
+- **Disponibilidad técnica integral:** La comprobación de disponibilidad evalúa todos los intervalos técnicos activos con sus fechas específicas frente a los demás eventos y bloqueos institucionales, excluyendo del análisis el evento que se encuentra en edición.
+- **Reglas de negocio y estado de confirmación:**
+  - *Regla implementada:* El fin de montaje no puede superar el inicio del evento cuando ocurren el mismo día. El inicio de desmontaje no puede ser anterior al fin del evento cuando ocurren el mismo día. El ensayo técnico debe finalizar antes del montaje o evento si coincide en la misma fecha.
+  - *Regla documentada como pendiente de confirmación:* Se documenta como **pendiente de confirmación con el área de operaciones** si el montaje previo y el desmontaje posterior pueden abarcar días distintos a la fecha del evento principal o si deben permanecer estrictamente unidos a la jornada de inicio y fin del evento. Actualmente el prototipo permite fechas independientes y valida que no colisionen con otras reservas en el auditorio.
+
+### 4. Comparativo en Dos Columnas (Paso 4: Revisión)
+- **Estructura en dos columnas:**
+  - **Columna izquierda:** “Datos actuales” (valores guardados en el sistema).
+  - **Columna derecha:** “Cambios propuestos” (nuevos valores modificados).
+- **Alineación fila por fila:** Ambos bloques alinean exactamente los mismos campos (nombre, cliente, contacto, teléfono, correo, solicitado por, observaciones, fecha de evento, horario, montaje, desmontaje y ensayo).
+- **Destacado selectivo:** Únicamente las filas que presentan diferencias efectivas reciben la clase `.fila-modificada` y la insignia visual `Modificado`, facilitando una auditoría visual inmediata.
+- **Adaptabilidad móvil:** En pantallas pequeñas (`≤ 768px`), las filas se transforman en tarjetas legibles que presentan claramente el bloque "Valor actual" frente a "Propuesta", conservando la relación comparativa sin desbordamientos.
+
+### 5. Resumen de Horas e Importe Adicional (Vista Asesor Comercial)
+- **Comparación de tiempos del evento:**
+  - Duración anterior del evento (ej. `3 h 00 min`).
+  - Duración propuesta del evento (ej. `3 h 30 min`).
+  - Diferencia de tiempo calculada (ej. `+30 min`, `Sin variación`, etc.).
+- **Reglas de importes para el Asesor Comercial:**
+  - **Sin ampliación (`diffMin <= 0`):** Muestra `Horas adicionales: 0` e `Importe adicional: No aplica`.
+  - **Con aumento de duración y tarifa configurada:** Muestra las horas adicionales ampliadas, la tarifa aplicada (`S/ XX.XX / h`) y el importe adicional calculado.
+  - **Con aumento de duración sin tarifa configurada:** Muestra las horas adicionales e `Importe adicional: Pendiente de cotización`.
+  - **Sin notas contractuales:** Resumen compacto y legible sin explicaciones contractuales ni cobros inventados, preservando los pagos registrados.
+
+### 6. Descarga de Resumen de Modificación en PDF para el Cliente
+- **Generación local mediante jsPDF (v2.5.1 UMD):** Almacenado localmente en `assets/vendor/jspdf/jspdf.umd.min.js`. No requiere conexión a internet ni CDN externo.
+- **Acción tras guardar exitosamente:** En la pantalla final de éxito del Paso 4 se ofrece el botón **“Descargar resumen de modificación en PDF”**.
+- **Contenido del PDF:**
+  - Encabezado con identidad Showtech Solutions (franja azul marino `#1f4e9c`, franja dorada, RUC 20613979051, auditorio).
+  - Ficha de datos del evento: código, nombre, cliente, contacto, lugar asignado, fecha de emisión.
+  - Tabla de cronograma confirmado: Evento principal, Montaje, Desmontaje y Ensayo con sus fechas y horarios.
+  - Tabla de modificaciones acordadas: valores anteriores vs valores nuevos.
+  - Resumen de duración e indicación de: *“Importe adicional por horas: Importe pendiente de cotización”*.
+  - **Exclusión de notas internas:** Se excluyen del documento las notas de auditoría o justificaciones internas destinadas únicamente a control del personal.
+  - Descarga directa real en el navegador (`Showtech_Resumen_Modificacion_[CODIGO].pdf`). No se simulan envíos de correo ni se muestran mensajes falsos de "PDF enviado".
+
+---
+
+## 3. Organización del Flujo en Cuatro Pasos
 
 1. **Paso 1: Seleccionar evento:**
-   - Tabla responsiva con listado de eventos registrados y buscador en tiempo real por código, cliente o nombre de evento.
-   - Indicadores visuales de estado (`Confirmado`, `Con adelanto`, `Pagado`).
-   - Botón de selección y banner informativo del evento cargado actualmente para edición.
+   - Tabla con anchos optimizados, saltos de línea automáticos, presentación compacta de tiempos técnicos y botón "Seleccionar" / "Editando" siempre visible sin scroll horizontal en escritorio.
+   - Vista móvil en tarjetas táctiles independientes.
+   - Buscador en tiempo real y banner del evento activo.
 2. **Paso 2: Modificar datos:**
-   - Código del evento y Auditorio asignado (`Auditorio Showtech`) fijos en modo solo lectura (`readonly`).
-   - Edición de información general: Nombre de la convocatoria, Cliente, Persona de contacto, Teléfono, Correo, Solicitado por (`Cliente` / `Asesor comercial`) y Observaciones.
-   - Edición de fecha y horario del evento (06:00 a 22:00, mismo día).
-   - Tiempos técnicos independientes:
-     - **Requiere montaje previo:** Despliega hora de inicio; finaliza al iniciar el evento.
-     - **Requiere desmontaje posterior:** Despliega hora de fin; inicia al terminar el evento.
-     - **Requiere ensayo técnico previo:** Despliega fecha, hora inicio y fin; debe finalizar antes del evento y no cruzarse con su montaje.
-   - Insignias visuales discretas `Modificado` para rastrear campos alterados.
-   - Botón directo **“Revisar y confirmar directo &rarr;”** activo cuando únicamente cambian datos generales sin alteración de horarios.
+   - Edición de información general y campos técnicos con Flatpickr (fecha y hora).
+   - Cronograma propuesto con pills visuales en tiempo real.
+   - Botón directo "Revisar y confirmar directo &rarr;" cuando solo cambian datos generales.
 3. **Paso 3: Validar disponibilidad:**
-   - Ficha resumen de la franja total solicitada (montaje, evento, desmontaje, ensayo).
-   - Botón de comprobación contra otros eventos registrados y bloqueos institucionales (`BLK-001`).
-   - Exclusión automática del evento actual evaluado.
-   - Admisión de intervalos consecutivos: eventos que finalizan exactamente a la misma hora en que otro inicia (`finA === inicioB`) no generan conflicto.
-   - Detección precisa de solapes con reporte detallado.
-   - **Sugerencias de horarios alternativos:** En caso de colisión, calcula hasta 3 opciones viables para el mismo día manteniendo la duración requerida, con botón para aplicar al formulario sin guardado automático.
+   - Resumen del cronograma técnico propuesto.
+   - Comprobación cruzada de intervalos completos.
+   - Generador de alternativas viables para el mismo día en caso de conflicto.
 4. **Paso 4: Revisar y confirmar:**
-   - **Resumen de diferencias (Diff):** Tabla comparativa entre el valor anterior registrado y el nuevo valor propuesto.
-   - **Ficha / Comprobante de modificación:** Con marca de agua `BORRADOR` antes de guardar, datos fiscales de la empresa (RUC 20613979051) y resumen integral.
-   - Campo opcional para ingresar el motivo de la modificación con fines de auditoría.
-   - **Revalidación atómica:** Antes de consolidar el guardado definitivo, vuelve a comprobar que los horarios sigan libres de conflicto. Ante cualquier colisión, se conservan los datos guardados originales y se cancela la operación.
-   - Al confirmar, almacena en `localStorage`, actualiza el historial de auditoría y genera el comprobante final con correlativo y opción de impresión.
+   - Cuadro comparativo en dos columnas con resaltado de modificaciones.
+   - Resumen de variación de duración y cotización pendiente.
+   - Desplegable opcional con la ficha completa del evento.
+   - Confirmación atómica y guardado en `localStorage`.
+   - Vista de éxito con opción de impresión y **descarga del resumen en PDF para el cliente**.
 
 ---
 
-## 3. Datos de Prueba Iniciales (Seed Data)
+## 4. Datos de Prueba Iniciales (Seed Data)
 
-- **EVT-001:** Ceremonia de graduación (Promoción Horizonte 2026), 07/11/2026, montaje desde 09:00, evento de 10:00 a 13:00 y desmontaje hasta 14:00.
-- **EVT-002:** Encuentro de docentes (Consejo Académico), 07/11/2026, montaje desde 15:00, evento de 16:00 a 19:00 y desmontaje hasta 20:00.
-- **BLK-001:** Bloqueo institucional por mantenimiento preventivo e iluminación en Auditorio Showtech, 06/11/2026 de 14:00 a 17:00.
+- **EVT-001:** Ceremonia de graduación (Promoción Horizonte 2026), 07/11/2026.
+  - Montaje: 07/11/2026 de 09:00 a 10:00.
+  - Evento: 07/11/2026 de 10:00 a 13:00.
+  - Desmontaje: 07/11/2026 de 13:00 a 14:00.
+  - Ensayo: No solicitado.
+- **EVT-002:** Encuentro de docentes (Consejo Académico), 07/11/2026.
+  - Montaje: 07/11/2026 de 15:00 a 16:00.
+  - Evento: 07/11/2026 de 16:00 a 19:00.
+  - Desmontaje: 07/11/2026 de 19:00 a 20:00.
+  - Ensayo: No solicitado.
+- **BLK-001:** Bloqueo institucional por mantenimiento preventivo, 06/11/2026 de 14:00 a 17:00.
 
 ---
 
-## 4. Instrucciones de Uso y Ejecución
+## 5. Pruebas Realizadas e Informe Técnico
+
+Se ejecutaron pruebas exhaustivas de integración y validación:
+
+1. **Pruebas de Componentes y Selectores:**
+   - **Selectores de hora:** Apertura flotante, inyección de encabezado ("Hora" / "Minutos") y botón "Listo". Precisión de un minuto y formato 24 horas comprobados. Verificación de rechazo a horas fuera de rango (`06:00` a `22:00`) sin corrección silenciosa.
+   - **Selectores de fecha:** Configuración en español con lunes como primer día de la semana verificada. Formato visible `dd/mm/aaaa` y valor interno `YYYY-MM-DD` comprobados. Apertura mediante clic en icono de calendario verificada.
+2. **Pruebas de Fechas y Horarios Técnicos:**
+   - Activación y desactivación de casillas independientes de montaje, desmontaje y ensayo.
+   - Verificación de no colisión en intervalos adyacentes (`10:00-13:00` y `13:00-14:00`).
+   - Detección precisa de solapamiento en intervalos cruzados (`10:00-13:00` y `12:00-14:00`).
+   - Sincronización automática de fechas de montaje/desmontaje con la fecha del evento.
+3. **Pruebas de Comparativa y Duración:**
+   - Comparativo en dos columnas alineado fila por fila.
+   - Resaltado estricto de solo las filas modificadas mediante `.fila-modificada` y `.pill-mod-inline`.
+   - Cálculo de diferencia de duración (`durActMin - durOrigMin`) con formato legible (`+30 min`, `Sin variación`, `-1 h`).
+   - Presentación de "Importe pendiente de cotización" sin alterar datos financieros.
+4. **Pruebas de Generación de PDF:**
+   - Generación exitosa de documento PDF con jsPDF 2.5.1 en memoria.
+   - Verificación de inclusión de metadatos, tabla de cronograma confirmado, tabla de cambios e importe pendiente.
+   - Verificación de exclusión de notas internas de auditoría.
+5. **Pruebas de Persistencia y Descarte:**
+   - Guardado definitivo en `localStorage` y actualización del historial de auditoría con correlativo.
+   - Modales de descarte protegiendo contra pérdida accidental de cambios.
+6. **Nota de Entorno:**
+   - La ejecución automatizada mediante el subagente de navegador no pudo completarse debido a restricciones del entorno en la descarga de controladores de navegador (error 404 en el proxy de descarga). Las pruebas estructurales, lógicas, visuales y de rendering se validaron a través del conjunto de pruebas automatizado de Node.js y revisión de código estático.
+
+---
+
+## 6. Instrucciones de Ejecución
 
 ### Opción 1: Abrir directamente en el navegador (Sin servidor)
 1. Abra el explorador de archivos en la carpeta del proyecto: `c:\Users\crist\gestor-eventos`.
@@ -80,40 +168,4 @@ Si prefiere ejecutarlo mediante un servidor HTTP local en PowerShell:
 ```powershell
 python -m http.server 8080
 ```
-Y acceda a: `http://localhost:8080/index.html`.
-
----
-
-## 5. Guía de Demostración del Flujo Completo
-
-### Demostración 1: Navegación y modificación de datos generales sin verificación de horarios
-1. En el **Paso 1**, seleccione el evento **EVT-001** o haga clic en **“Continuar con este evento &rarr;”**.
-2. En el **Paso 2**, modifique el campo **Persona de contacto** por `Lic. Sofía Alarcón` y el **Teléfono** por `991 223 344`.
-3. Note cómo aparece la etiqueta amarilla `Modificado` junto a dichos campos y se activa el botón verde **“Revisar y confirmar directo &rarr;”**.
-4. Haga clic en **“Revisar y confirmar directo &rarr;”**: el sistema permite pasar directamente al **Paso 4** sin exigir validación de horarios, mostrando en la tabla de diferencias los campos modificados.
-
-### Demostración 2: Tiempos técnicos independientes y validación disponible
-1. En el **Paso 2**, desactive la casilla **“Requiere desmontaje posterior”**.
-2. Observe que el cronograma propuesto elimina la franja de desmontaje, manteniendo únicamente el montaje (`09:00 - 10:00`) y el evento (`10:00 - 13:00`).
-3. Avance al **Paso 3** haciendo clic en **“Validar disponibilidad &rarr;”**.
-4. Haga clic en **“Comprobar disponibilidad en auditorio”**: el sistema confirma con el aviso verde **`✓ Horario disponible en Auditorio Showtech`** y habilita el botón **“Continuar a revisión y confirmación &rarr;”**.
-
-### Demostración 3: Conflicto de disponibilidad y sugerencias de horarios
-1. En el **Paso 2**, cambie el horario del evento para que inicie a las `16:00` y finalice a las `19:00` (horario en el que transcurre el evento `EVT-002`).
-2. Avance al **Paso 3** y haga clic en **“Comprobar disponibilidad en auditorio”**.
-3. El sistema desplegará el panel de conflicto en rojo detallando el cruce con `EVT-002: Encuentro de docentes` y generará la caja de **“Horarios alternativos disponibles para el mismo día”**.
-4. Al pulsar **“Aplicar este horario”** en cualquiera de las sugerencias, los campos se actualizan sin guardar automáticamente y se revalida la disponibilidad quedando en verde.
-
-### Demostración 4: Admisión de intervalos consecutivos
-1. En el evento **EVT-001**, configure el fin de desmontaje exactamente a las `15:00`.
-2. Dado que **EVT-002** inicia su montaje a las `15:00`, compruebe la disponibilidad en el **Paso 3**.
-3. El sistema valida exitosamente la franja como disponible, demostrando que dos eventos consecutivos en frontera (`15:00`) no colisionan.
-
-### Demostración 5: Descarte seguro y confirmación de guardado con historial
-1. Al intentar descartar cambios en el Paso 2 o Paso 4, el modal de confirmación protege los datos evitando pérdidas accidentales.
-2. Al pulsar **“Confirmar y guardar cambios”** en el Paso 4:
-   - Se realiza la comprobación final de disponibilidad.
-   - Se guardan los datos en `localStorage`.
-   - Se emite el comprobante definitivo y se anota el cambio en el **Historial de auditoría**.
-   - Al recargar la página (`F5`), todos los cambios y el historial permanecen intactos.
-3. Para volver al estado inicial de pruebas en cualquier momento, use el botón **“Restablecer demo”** en el encabezado.
+Y acceda en su navegador a: `http://localhost:8080/index.html`.

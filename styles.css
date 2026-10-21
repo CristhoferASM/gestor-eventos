@@ -1,10 +1,10 @@
 /* ==========================================================================
    SHOWTECH SOLUTIONS - GESTOR DE EVENTOS
    Módulo: Modificar datos del evento
-   Diseño de referencia: registro-pago-evento.html
-   Colores corporativos: #13264a (marino), #1f4e9c (azul), #f2a900 (dorado), #f5f7fb (fondo)
+   Diseño de referencia unificado: registro-pago-evento.html
    ========================================================================== */
 
+/* ===== 1. COLORES DE MARCA ===== */
 :root {
   --primario: #13264a;      /* azul marino */
   --primario-2: #1f4e9c;    /* azul */
@@ -19,6 +19,7 @@
   --blanco: #ffffff;
 }
 
+/* ===== 2. REGLAS BASE Y TIPOGRAFÍA ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -31,10 +32,9 @@ body {
   color: var(--texto);
   font-size: 15px;
   line-height: 1.45;
-  min-height: 100vh;
 }
 
-/* Encabezado */
+/* ===== 3. ENCABEZADO ===== */
 header {
   background: var(--primario);
   color: var(--blanco);
@@ -43,7 +43,7 @@ header {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
 .marca {
@@ -59,13 +59,13 @@ header {
 .header-der {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .usuario {
   font-size: 13px;
-  opacity: .9;
+  opacity: .85;
 }
 
 .btn-demo {
@@ -80,7 +80,7 @@ header {
   align-items: center;
   gap: 6px;
   font-family: inherit;
-  transition: background 0.2s;
+  transition: background 0.15s;
 }
 
 .btn-demo:hover {
@@ -88,25 +88,16 @@ header {
 }
 
 .btn-demo svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
-/* Contenedor principal */
+/* ===== 4. CONTENIDO PRINCIPAL Y TÍTULOS ===== */
 main {
   max-width: 1100px;
   margin: 24px auto;
-  padding: 0 16px 36px;
-}
-
-.encabezado-seccion {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+  padding: 0 16px;
 }
 
 h1 {
@@ -117,29 +108,11 @@ h1 {
 
 .sub {
   color: var(--gris);
+  margin-bottom: 20px;
   font-size: 14px;
 }
 
-.aviso-demo-tag {
-  background: #fff4d6;
-  border: 1px solid #fedc96;
-  color: #8a6100;
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 500;
-}
-
-.aviso-demo-tag svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-/* Barra de Pasos */
+/* ===== 5. INDICADORES DE PASOS ===== */
 .pasos {
   display: flex;
   gap: 8px;
@@ -149,7 +122,7 @@ h1 {
 
 .paso {
   flex: 1;
-  min-width: 160px;
+  min-width: 150px;
   background: var(--blanco);
   border: 1px solid var(--borde);
   border-radius: 8px;
@@ -159,8 +132,8 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s;
   user-select: none;
+  transition: border-color 0.15s, color 0.15s;
 }
 
 .paso.clic {
@@ -190,8 +163,6 @@ h1 {
   border-color: var(--primario-2);
   color: var(--primario);
   font-weight: bold;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(31, 78, 156, 0.1);
 }
 
 .paso.activo .num {
@@ -204,14 +175,19 @@ h1 {
   color: var(--blanco);
 }
 
-/* Tarjeta */
+/* ===== 6. TARJETAS ===== */
 .tarjeta {
   background: var(--blanco);
   border: 1px solid var(--borde);
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.tarjeta h2 {
+  font-size: 17px;
+  color: var(--primario);
+  margin-bottom: 14px;
 }
 
 .tarjeta-cabecera-flex {
@@ -223,12 +199,6 @@ h1 {
   margin-bottom: 14px;
 }
 
-.tarjeta h2 {
-  font-size: 17px;
-  color: var(--primario);
-  margin-bottom: 14px;
-}
-
 .tarjeta-cabecera-flex h2 {
   margin-bottom: 0;
 }
@@ -236,40 +206,62 @@ h1 {
 .tarjeta h3 {
   font-size: 14px;
   color: var(--primario-2);
-  margin: 18px 0 10px;
+  margin: 18px 0 12px;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--borde);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .tarjeta h3:first-of-type {
   margin-top: 0;
 }
 
+/* Bloque 2: Fecha y Horario del Evento */
+.bloque-fecha-evento {
+  margin-top: 18px;
+}
+
+.bloque-fecha-evento h3,
+.titulo-fecha-evento {
+  font-size: 14px;
+  color: var(--primario-2);
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.insignia-evento-wrap {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.insignia-evento-wrap .badge-tecnico.badge-evento {
+  margin: 0;
+}
+
 .oculto {
   display: none !important;
 }
 
-/* Tabla y Barra de búsqueda */
+/* ===== 7. TABLA Y BARRA DE BÚSQUEDA ===== */
 .barra {
   display: flex;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .buscador {
   flex: 1;
-  min-width: 220px;
+  min-width: 200px;
   padding: 9px 12px;
   border: 1px solid var(--borde);
   border-radius: 6px;
   font-size: 14px;
+  font-family: inherit;
   background: var(--blanco);
-  outline: none;
+  color: var(--texto);
 }
 
 .buscador:focus {
@@ -287,7 +279,7 @@ h1 {
   overflow-x: auto;
   border: 1px solid var(--borde);
   border-radius: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 table {
@@ -300,21 +292,21 @@ th {
   background: var(--primario);
   color: var(--blanco);
   text-align: left;
-  padding: 10px 12px;
-  font-weight: 600;
+  padding: 10px 8px;
+  font-weight: normal;
   white-space: nowrap;
   font-size: 13px;
 }
 
 td {
-  padding: 10px 12px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--borde);
   white-space: nowrap;
   vertical-align: middle;
 }
 
-tr:last-child td {
-  border-bottom: none;
+#tablaEventos td {
+  font-size: 13px;
 }
 
 tr:hover td {
@@ -335,7 +327,179 @@ tr.fila-activa td {
   padding: 24px;
 }
 
-/* Etiquetas / Badges */
+/* Ajustes de columnas para escritorio sin scroll horizontal */
+td.col-cliente,
+td.col-evento {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.th-codigo, td.col-codigo {
+  width: 85px;
+  white-space: nowrap;
+}
+
+.th-cliente, td.col-cliente {
+  min-width: 130px;
+  max-width: 180px;
+}
+
+.th-evento, td.col-evento {
+  min-width: 140px;
+  max-width: 220px;
+}
+
+.th-fecha, td.col-fecha {
+  width: 95px;
+  white-space: nowrap;
+}
+
+.th-horario, td.col-horario {
+  width: 110px;
+  white-space: nowrap;
+}
+
+.th-tecnicos, td.col-tecnicos {
+  min-width: 130px;
+  white-space: normal;
+}
+
+.th-estado, td.col-estado {
+  width: 105px;
+  white-space: nowrap;
+}
+
+.th-accion, td.col-accion {
+  width: 105px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tecnicos-compacto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.tecnicos-compacto span {
+  display: inline-block;
+  color: var(--gris);
+}
+
+.tecnicos-compacto strong {
+  color: var(--primario);
+  font-weight: 600;
+}
+
+/* Tarjetas de eventos para vista móvil */
+.tarjetas-eventos-movil {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.tarjeta-evento-item {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.tarjeta-evento-item.activa {
+  border: 2px solid var(--primario-2);
+  background: #f7f9fd;
+}
+
+.tarjeta-evento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.tarjeta-evento-codigo {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--primario);
+}
+
+.tarjeta-evento-titulo {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--primario);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.tarjeta-evento-cliente {
+  font-size: 13px;
+  color: var(--gris);
+  margin-bottom: 10px;
+}
+
+.tarjeta-evento-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 12px;
+  background: var(--suave);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.tarjeta-evento-dato-completo {
+  grid-column: 1 / -1;
+}
+
+.tarjeta-evento-datos small {
+  display: block;
+  color: var(--gris);
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.tarjeta-evento-datos strong {
+  color: var(--primario);
+}
+
+.tarjeta-evento-item .btn {
+  width: 100%;
+}
+
+/* Banner de evento seleccionado en Paso 1 */
+.banner-seleccionado {
+  background: var(--suave);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.banner-texto small {
+  display: block;
+  font-size: 12px;
+  color: var(--gris);
+  margin-bottom: 2px;
+}
+
+.banner-texto strong {
+  color: var(--primario);
+  font-size: 14px;
+}
+
+/* ===== 8. ETIQUETAS (BADGES) ===== */
 .etiqueta {
   display: inline-block;
   padding: 3px 9px;
@@ -344,19 +508,19 @@ tr.fila-activa td {
   font-weight: bold;
 }
 
-.et-confirmado {
-  background: #dcf3e7;
-  color: var(--ok);
-}
-
 .et-adelanto {
   background: #fff4d6;
   color: #8a6100;
 }
 
 .et-pagado {
-  background: #d8eaff;
-  color: var(--primario-2);
+  background: #dcf3e7;
+  color: var(--ok);
+}
+
+.et-confirmado {
+  background: #dcf3e7;
+  color: var(--ok);
 }
 
 .et-bloqueo {
@@ -387,33 +551,7 @@ tr.fila-activa td {
   display: inline-block;
 }
 
-/* Banner de evento seleccionado en Paso 1 */
-.banner-seleccionado {
-  background: var(--suave);
-  border: 1px solid var(--borde);
-  border-radius: 8px;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-  flex-wrap: wrap;
-}
-
-.banner-texto small {
-  display: block;
-  font-size: 12px;
-  color: var(--gris);
-  margin-bottom: 2px;
-}
-
-.banner-texto strong {
-  color: var(--primario);
-  font-size: 14px;
-}
-
-/* Botones */
+/* ===== 9. BOTONES ===== */
 .btn {
   border: none;
   border-radius: 6px;
@@ -481,9 +619,7 @@ tr.fila-activa td {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  margin-top: 20px;
-  padding-top: 14px;
-  border-top: 1px solid var(--borde);
+  margin-top: 18px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -494,7 +630,7 @@ tr.fila-activa td {
   flex-wrap: wrap;
 }
 
-/* Formulario */
+/* ===== 10. FORMULARIO Y CONTROLES (DELIMITADOS) ===== */
 .form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -505,7 +641,7 @@ label {
   display: block;
   font-size: 13px;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   color: var(--primario);
 }
 
@@ -519,7 +655,13 @@ label .req {
   margin-left: 2px;
 }
 
-input, select, textarea {
+/* Reglas delimitadas a los controles del formulario para no deformar elementos de Flatpickr */
+.form input:not([class*="flatpickr"]),
+.form select:not([class*="flatpickr"]),
+.form textarea,
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
   width: 100%;
   padding: 9px 10px;
   border: 1px solid var(--borde);
@@ -531,18 +673,23 @@ input, select, textarea {
   transition: border-color 0.15s, outline 0.15s;
 }
 
+.form input[readonly],
 input[readonly] {
   background: var(--suave);
   color: var(--gris);
   cursor: not-allowed;
 }
 
-input:focus, select:focus, textarea:focus {
+.form input:focus:not([class*="flatpickr"]),
+.form select:focus:not([class*="flatpickr"]),
+.form textarea:focus {
   outline: 2px solid var(--primario-2);
   border-color: transparent;
 }
 
-input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
+.form input.campo-modificado,
+.form select.campo-modificado,
+.form textarea.campo-modificado {
   border-color: #f2a900;
   background-color: #fffdf5;
 }
@@ -556,7 +703,7 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   font-size: 13px;
   margin-top: 10px;
   min-height: 18px;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .msg-error-campo {
@@ -571,27 +718,441 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   font-size: 12px;
   color: var(--gris);
   margin-top: 4px;
-  line-height: 1.35;
+}
+
+.opc-tit {
+  font-weight: normal;
+  color: var(--gris);
+  font-size: 12px;
 }
 
 .nota-ejemplo {
   font-size: 12px;
   color: var(--gris);
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
-/* Cajas de tiempos adicionales (montaje, desmontaje, ensayo) */
+/* ===== 11. SELECTORES DE HORA Y FECHA (FLATPICKR) ===== */
+.campo-hora-wrap,
+.campo-fecha-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.campo-hora-wrap input.input-hora,
+.campo-fecha-wrap input.input-fecha,
+.campo-fecha-wrap .flatpickr-input {
+  width: 100%;
+  padding: 9px 36px 9px 10px;
+  height: 38px;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--texto);
+  font-weight: normal;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, outline 0.15s ease;
+}
+
+.campo-hora-wrap input.input-hora:focus,
+.campo-fecha-wrap input.input-fecha:focus,
+.campo-fecha-wrap .flatpickr-input:focus {
+  outline: 2px solid var(--primario-2);
+  border-color: transparent;
+}
+
+.campo-hora-wrap input.input-hora:disabled,
+.campo-fecha-wrap input.input-fecha:disabled,
+.campo-fecha-wrap .flatpickr-input:disabled {
+  background-color: var(--suave);
+  color: var(--gris);
+  cursor: not-allowed;
+}
+
+.campo-hora-wrap .icono-reloj,
+.campo-fecha-wrap .icono-calendario {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gris);
+  pointer-events: none;
+  transition: color 0.15s ease;
+}
+
+.campo-hora-wrap:focus-within .icono-reloj,
+.campo-fecha-wrap:focus-within .icono-calendario {
+  color: var(--primario-2);
+}
+
+.campo-hora-wrap input.input-hora.campo-modificado,
+.campo-fecha-wrap input.input-fecha.campo-modificado {
+  border-color: #f2a900;
+  background-color: #fffdf5;
+}
+
+.campo-hora-wrap input.input-hora.input-error,
+.campo-fecha-wrap input.input-fecha.input-error,
+input.input-error {
+  border-color: var(--error) !important;
+  background-color: #fff5f5 !important;
+  outline-color: var(--error) !important;
+}
+
+/* Panel Flotante de Flatpickr */
+.flatpickr-calendar {
+  background: var(--blanco) !important;
+  border: 1px solid var(--borde) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(19, 38, 74, 0.14) !important;
+  font-family: inherit !important;
+  z-index: 99999 !important;
+  overflow: visible !important;
+}
+
+/* Panel Selector de Hora */
+.flatpickr-calendar.noCalendar {
+  width: auto !important;
+  min-width: 220px !important;
+  padding: 12px 14px !important;
+}
+
+.flatpickr-time-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eef1fb;
+  margin-bottom: 10px;
+}
+
+.flatpickr-time-header .fp-col-title {
+  font-size: 11.5px;
+  font-weight: bold;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  width: 58px;
+  text-align: center;
+}
+
+.flatpickr-time-header .fp-col-sep {
+  width: 14px;
+}
+
+.flatpickr-calendar .flatpickr-time {
+  height: 48px !important;
+  line-height: 48px !important;
+  max-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-top: none !important;
+  padding: 0 !important;
+  gap: 4px !important;
+}
+
+.flatpickr-calendar .flatpickr-time .numInputWrapper {
+  width: 58px !important;
+  flex: none !important;
+  height: 44px !important;
+}
+
+.flatpickr-calendar .flatpickr-time input {
+  width: 58px !important;
+  max-width: 58px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1.5px solid #d9deea !important;
+  border-radius: 6px !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  color: var(--primario) !important;
+  background: #ffffff !important;
+  text-align: center !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.flatpickr-calendar .flatpickr-time input:focus {
+  background: #eef1fb !important;
+  border-color: var(--primario-2) !important;
+  color: var(--primario-2) !important;
+}
+
+.flatpickr-calendar .flatpickr-time .flatpickr-time-separator {
+  color: var(--primario) !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  width: 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.flatpickr-calendar .flatpickr-time .numInputWrapper span {
+  border: none !important;
+  width: 16px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0.7 !important;
+}
+
+.flatpickr-calendar .flatpickr-time .numInputWrapper span:hover {
+  background: rgba(31, 78, 156, 0.15) !important;
+  opacity: 1 !important;
+}
+
+.flatpickr-calendar .flatpickr-time .numInputWrapper span.arrowUp:after {
+  border-bottom-color: var(--primario-2) !important;
+}
+
+.flatpickr-calendar .flatpickr-time .numInputWrapper span.arrowDown:after {
+  border-top-color: var(--primario-2) !important;
+}
+
+.flatpickr-time-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #eef1fb;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-fp-listo {
+  width: 100%;
+  padding: 8px 14px;
+  background: var(--primario-2);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-fp-listo:hover {
+  background: var(--primario);
+}
+
+/* Calendario Flatpickr (Español) */
+.flatpickr-calendar:not(.noCalendar) {
+  width: 324px !important;
+  max-width: calc(100vw - 20px) !important;
+  padding: 10px 8px !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--borde) !important;
+  box-shadow: 0 10px 25px -5px rgba(19, 38, 74, 0.15) !important;
+  background: #ffffff !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-innerContainer {
+  width: 100% !important;
+  display: block !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-rContainer {
+  width: 100% !important;
+  display: block !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-days {
+  width: 308px !important;
+  min-width: 308px !important;
+  max-width: 308px !important;
+  margin: 0 auto !important;
+  overflow: visible !important;
+  display: flex !important;
+  box-sizing: border-box !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .dayContainer {
+  width: 308px !important;
+  min-width: 308px !important;
+  max-width: 308px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: flex-start !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  outline: 0 !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-weekdays {
+  width: 308px !important;
+  min-width: 308px !important;
+  max-width: 308px !important;
+  margin: 0 auto 6px auto !important;
+  display: flex !important;
+  background: #f8fafc !important;
+  border-radius: 6px !important;
+  padding: 6px 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-weekdaycontainer {
+  width: 100% !important;
+  display: flex !important;
+  box-sizing: border-box !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) span.flatpickr-weekday {
+  width: 44px !important;
+  flex: 0 0 44px !important;
+  max-width: 44px !important;
+  text-align: center !important;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  color: #475569 !important;
+  box-sizing: border-box !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day {
+  width: 44px !important;
+  flex: 0 0 44px !important;
+  max-width: 44px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  margin: 1px 0 !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  border-radius: 6px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  border: 1px solid transparent !important;
+  transition: background 0.15s, color 0.15s !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day.prevMonthDay,
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day.nextMonthDay {
+  color: #94a3b8 !important;
+  background: transparent !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day:hover {
+  background: #eef1fb !important;
+  color: var(--primario-2) !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day.selected,
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day.startRange,
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day.endRange {
+  background: var(--primario-2) !important;
+  color: #ffffff !important;
+  border-color: var(--primario-2) !important;
+  font-weight: bold !important;
+}
+
+.flatpickr-calendar:not(.noCalendar) .flatpickr-day.today {
+  border: 1.5px solid var(--primario-2) !important;
+  background: transparent !important;
+  color: var(--primario-2) !important;
+  font-weight: bold !important;
+}
+
+.flatpickr-months {
+  background: #ffffff !important;
+  padding-bottom: 6px !important;
+}
+
+.flatpickr-months .flatpickr-month {
+  color: var(--primario) !important;
+  fill: var(--primario) !important;
+  font-weight: bold !important;
+  height: 34px !important;
+}
+
+.flatpickr-current-month {
+  font-size: 14px !important;
+  font-weight: bold !important;
+  color: var(--primario) !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  font-weight: bold !important;
+  color: var(--primario) !important;
+}
+
+.flatpickr-current-month input.cur-year {
+  font-weight: bold !important;
+  color: var(--primario) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  padding: 8px !important;
+  color: var(--primario) !important;
+  fill: var(--primario) !important;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--primario-2) !important;
+}
+
+/* ===== 12. BLOQUES TÉCNICOS (MONTAJE, DESMONTAJE, ENSAYO) ===== */
+.contenedor-tiempos-tecnicos,
+.grid-montaje-desmontaje,
 .grid-adicionales {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 14px;
+  width: 100%;
 }
 
 .caja-adicional {
   background: var(--suave);
   border: 1px solid var(--borde);
   border-radius: 8px;
-  padding: 14px;
+  padding: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: padding 0.15s ease, background 0.15s ease;
+}
+
+.caja-adicional.desactivada {
+  padding: 14px 16px;
+}
+
+.caja-adicional-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.caja-adicional.desactivada .caja-adicional-cabecera,
+.caja-adicional:has(.campos-adicional.oculto) .caja-adicional-cabecera {
+  margin-bottom: 0 !important;
 }
 
 .check-label {
@@ -618,7 +1179,124 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   border-top: 1px dashed var(--borde);
 }
 
-/* Cronograma / resumen visual de franjas */
+.campos-adicional.oculto {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  height: 0 !important;
+}
+
+/* En escritorio: 1 sola fila con 3 columnas equilibradas (dando algo más de ancho a la fecha) */
+.form-tecnico {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.campo-tecnico-fecha,
+.form-tecnico > div:first-child {
+  grid-column: 1;
+  width: 100%;
+}
+
+.campo-tecnico-inicio,
+.form-tecnico > div:nth-child(2) {
+  grid-column: 2;
+  width: 100%;
+}
+
+.campo-tecnico-fin,
+.form-tecnico > div:nth-child(3) {
+  grid-column: 3;
+  width: 100%;
+}
+
+.form-tecnico > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-tecnico label {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  gap: 3px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--primario);
+}
+
+.form-tecnico label .req {
+  color: var(--error);
+  display: inline-block;
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+.form-tecnico .mod-pill {
+  font-size: 10.5px;
+  padding: 1px 6px;
+  line-height: 1.2;
+}
+
+.form-tecnico .campo-fecha-wrap,
+.form-tecnico .campo-hora-wrap,
+.form-tecnico input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.campos-adicional .ayuda {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--gris);
+}
+
+/* Badges e Identificadores Técnicos */
+.badge-tecnico {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.badge-tecnico.badge-evento {
+  background: #eef2ff;
+  color: #1f4e9c;
+  border: 1px solid #c7d2fe;
+}
+
+.badge-tecnico.badge-montaje {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-tecnico.badge-desmontaje {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.badge-tecnico.badge-ensayo {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+/* Resumen visual de franjas */
 .resumen-horario-box {
   background: #ffffff;
   border: 1px solid var(--borde);
@@ -652,10 +1330,14 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   font-weight: 500;
 }
 
+.timeline-pill .pill-label {
+  font-weight: bold;
+}
+
 .timeline-pill.montaje {
-  background: #fef4e8;
+  background: #fef3c7;
   color: #92400e;
-  border: 1px solid #fed7aa;
+  border: 1px solid #fcd34d;
 }
 
 .timeline-pill.evento {
@@ -665,18 +1347,18 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
 }
 
 .timeline-pill.desmontaje {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
 }
 
 .timeline-pill.ensayo {
-  background: #fdf2f8;
-  color: #9d174d;
-  border: 1px solid #fbcfe8;
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
 }
 
-/* Grilla de detalle de datos (Paso 3) */
+/* ===== 13. DETALLE / GRID / DATO (PASO 3) ===== */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -688,7 +1370,6 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   background: var(--suave);
   border-radius: 8px;
   padding: 10px 12px;
-  border: 1px solid var(--borde);
 }
 
 .dato small {
@@ -704,66 +1385,56 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   word-break: break-word;
 }
 
-/* Validación y feedback */
-.acciones-validacion {
-  margin: 16px 0;
-  display: flex;
-  gap: 10px;
+.saldo strong {
+  color: var(--error);
+  font-size: 18px;
 }
 
+/* Avisos y feedback */
 .aviso {
   border-radius: 8px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  border-left: 4px solid transparent;
-}
-
-.aviso-titulo {
+  padding: 12px 14px;
+  margin-bottom: 14px;
   font-weight: bold;
-  font-size: 15px;
-  margin-bottom: 4px;
 }
 
 .aviso-ok {
   background: #dcf3e7;
   color: var(--ok);
-  border-left-color: var(--ok);
-}
-
-.aviso-error {
-  background: #fce8e6;
-  color: var(--error);
-  border-left-color: var(--error);
 }
 
 .aviso-info {
   background: var(--suave);
   color: var(--primario);
-  border-left-color: var(--primario-2);
+  font-weight: normal;
+}
+
+.aviso-error {
+  background: #fce8e6;
+  color: var(--error);
 }
 
 .feedback-lista {
   margin-top: 8px;
   padding-left: 20px;
   font-size: 13px;
+  font-weight: normal;
 }
 
 .feedback-lista li {
   margin-bottom: 4px;
 }
 
-/* Sugerencias de horarios */
 .sugerencias-box {
   background: #fffdf5;
   border: 1px solid #fedc96;
   border-radius: 8px;
-  padding: 16px;
+  padding: 14px;
   margin-bottom: 16px;
 }
 
 .sugerencias-box h4 {
-  font-size: 15px;
+  font-size: 14px;
   color: #8a6100;
   margin-bottom: 4px;
 }
@@ -787,7 +1458,7 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
 }
 
 .sugerencia-card .sug-horario {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   color: var(--primario);
 }
@@ -798,46 +1469,251 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   line-height: 1.35;
 }
 
-/* Tabla de Diferencias (Diff) */
-.diff-tabla {
+/* ===== 14. COMPARATIVO EN DOS COLUMNAS (PASO 4) ===== */
+.comparativo-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #ffffff;
+  margin-bottom: 16px;
+}
+
+.comparativo-tabla {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
-.diff-tabla th {
+.comparativo-tabla th {
+  padding: 10px 14px;
   background: var(--suave);
   color: var(--primario);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  border-bottom: 1px solid var(--borde);
-}
-
-.diff-tabla td {
-  padding: 9px 12px;
-  border-bottom: 1px solid var(--borde);
-}
-
-.diff-previo {
-  color: var(--gris);
-  text-decoration: line-through;
-  background: #fef2f2;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.diff-nuevo {
-  color: #065f46;
+  font-size: 12.5px;
   font-weight: bold;
-  background: #ecfdf5;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1.5px solid var(--borde);
+  text-align: left;
 }
 
-/* Comprobante de Modificación de Evento */
+.comparativo-tabla th.th-concepto {
+  width: 28%;
+}
+
+.comparativo-tabla th.th-actual {
+  width: 36%;
+  border-right: 1px solid var(--borde);
+}
+
+.comparativo-tabla th.th-propuesto {
+  width: 36%;
+}
+
+.comparativo-tabla td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--borde);
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+.comparativo-tabla td.celda-actual {
+  border-right: 1px solid var(--borde);
+  color: #475569;
+}
+
+.comparativo-tabla td.celda-propuesta {
+  color: #1e293b;
+}
+
+.comparativo-tabla tr.fila-modificada td.celda-actual {
+  background: #fefefe;
+  color: #64748b;
+}
+
+.comparativo-tabla tr.fila-modificada td.celda-propuesta {
+  background: #fffdf5;
+  font-weight: bold;
+  color: #13264a;
+}
+
+.pill-mod-inline {
+  display: inline-block;
+  background: #f2a900;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* ===== 15. RESUMEN DE HORAS E IMPORTE ADICIONAL (ASESOR COMERCIAL) ===== */
+.resumen-duracion-box {
+  background: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.resumen-duracion-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.resumen-duracion-titulo {
+  font-size: 13.5px;
+  font-weight: bold;
+  color: var(--primario);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.grid-duracion {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.item-duracion {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.item-duracion small {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.item-duracion strong {
+  display: block;
+  font-size: 16px;
+  color: var(--primario);
+}
+
+.item-duracion span {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.item-duracion .diff-mas,
+.diff-mas {
+  color: #b45309;
+}
+
+.item-duracion .diff-menos,
+.diff-menos {
+  color: #047857;
+}
+
+.resumen-comercial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.item-comercial {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.item-comercial .comercial-valor {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--primario);
+}
+
+.item-comercial .comercial-valor.diff-mas {
+  color: #b45309;
+}
+
+.item-comercial .comercial-valor.importe-no-aplica {
+  color: #64748b;
+}
+
+.item-comercial .comercial-valor.importe-calculado {
+  color: #1f4e9c;
+}
+
+.item-comercial .comercial-valor.importe-pendiente {
+  color: #b45309;
+}
+
+.item-comercial .comercial-sub {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+/* ===== 16. COMPROBANTE Y FICHA COMPLETA ===== */
+.ficha-toggle-wrapper {
+  margin: 16px 0 10px;
+}
+
+.btn-ficha-toggle {
+  background: #ffffff;
+  color: var(--primario-2);
+  border: 1px solid var(--primario-2);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: bold;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: auto;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.btn-ficha-toggle:hover {
+  background: var(--suave);
+  color: var(--primario);
+}
+
+.btn-ficha-toggle .icono-doc {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.btn-ficha-toggle .icono-flecha {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-ficha-toggle[aria-expanded="true"] .icono-flecha {
+  transform: rotate(180deg);
+}
+
+.contenedor-ficha-completa {
+  margin-top: 10px;
+}
+
 .comprobante {
   position: relative;
   border: 2px dashed var(--primario-2);
@@ -858,16 +1734,12 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-20deg);
-  font-size: 64px;
+  font-size: 72px;
   font-weight: bold;
   color: rgba(31, 78, 156, .08);
   pointer-events: none;
   letter-spacing: 6px;
   user-select: none;
-}
-
-.comprobante.final .marca-agua {
-  color: rgba(30, 142, 90, .08);
 }
 
 .comp-cab {
@@ -900,27 +1772,19 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   padding: 5px 0;
   border-bottom: 1px solid var(--borde);
   font-size: 14px;
-  gap: 12px;
-}
-
-.comp-fila span:first-child {
-  color: var(--gris);
+  gap: 10px;
 }
 
 .comp-fila span:last-child {
   text-align: right;
-  font-weight: 500;
-  color: var(--texto);
+  font-weight: normal;
 }
 
 .comp-total {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: bold;
-  color: var(--primario);
+  color: var(--ok);
   border-bottom: none;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--borde);
 }
 
 /* Historial de Auditoría */
@@ -929,7 +1793,6 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   font-weight: bold;
   color: var(--primario);
   font-size: 14px;
-  outline: none;
   padding: 4px 0;
 }
 
@@ -968,7 +1831,7 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   color: var(--texto);
 }
 
-/* Modales */
+/* ===== 17. MODALES Y TOASTS ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -991,12 +1854,6 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   width: 100%;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  animation: modalEntrar 0.2s ease-out;
-}
-
-@keyframes modalEntrar {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-header {
@@ -1044,7 +1901,6 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   gap: 10px;
 }
 
-/* Toasts flotantes */
 .toast-container {
   position: fixed;
   bottom: 20px;
@@ -1064,7 +1920,6 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   font-size: 13px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   pointer-events: auto;
-  animation: toastIn 0.25s ease-out;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1078,21 +1933,120 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   background: var(--error);
 }
 
-@keyframes toastIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ===== 18. ADAPTACIÓN RESPONSIVE (MÓVIL Y ESCRITORIO) ===== */
+@media (max-width: 768px) {
+  .tabla-wrap.tabla-desktop {
+    display: none;
+  }
+
+  .tarjetas-eventos-movil {
+    display: flex;
+  }
+
+  .contenedor-tiempos-tecnicos,
+  .grid-montaje-desmontaje,
+  .grid-adicionales {
+    gap: 12px;
+  }
+
+  .form-tecnico {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 14px;
+  }
+
+  .campo-tecnico-fecha,
+  .form-tecnico > div:first-child {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .campo-tecnico-inicio,
+  .form-tecnico > div:nth-child(2) {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  .campo-tecnico-fin,
+  .form-tecnico > div:nth-child(3) {
+    grid-column: 2;
+    width: 100%;
+  }
+
+  .comparativo-tabla,
+  .comparativo-tabla thead,
+  .comparativo-tabla tbody,
+  .comparativo-tabla th,
+  .comparativo-tabla td,
+  .comparativo-tabla tr {
+    display: block;
+  }
+
+  .comparativo-tabla thead {
+    display: none;
+  }
+
+  .comparativo-tabla tr {
+    border-bottom: 2px solid var(--borde);
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #ffffff;
+    border-radius: 8px;
+  }
+
+  .comparativo-tabla tr.fila-modificada {
+    border-left: 4px solid #f2a900;
+  }
+
+  .comparativo-tabla td {
+    padding: 5px 0;
+    border-bottom: none;
+  }
+
+  .comparativo-tabla td.th-concepto-m {
+    font-weight: bold;
+    color: var(--primario);
+    font-size: 14px;
+    border-bottom: 1px dashed #e2e8f0;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+  }
+
+  .comparativo-tabla td.celda-actual {
+    border-right: none;
+  }
+
+  .comparativo-tabla td.celda-actual:before {
+    content: "Actual: ";
+    font-weight: bold;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  .comparativo-tabla td.celda-propuesta:before {
+    content: "Propuesto: ";
+    font-weight: bold;
+    color: var(--primario-2);
+    font-size: 12px;
+  }
 }
 
-/* Adaptación Responsive */
-@media (max-width: 680px) {
+@media (max-width: 600px) {
   header {
     padding: 12px 16px;
   }
-  
-  .marca {
-    font-size: 18px;
+
+  .tarjeta {
+    padding: 16px 14px;
   }
-  
+
+  .caja-adicional {
+    padding: 12px;
+  }
+
+  .caja-adicional.desactivada {
+    padding: 10px 12px;
+  }
+
   .paso {
     min-width: calc(50% - 4px);
     font-size: 12px;
@@ -1106,7 +2060,7 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   }
 
   .marca-agua {
-    font-size: 40px;
+    font-size: 44px;
   }
 
   .acciones {
@@ -1132,15 +2086,27 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   }
 }
 
-/* Estilos de Impresión */
+@media (max-width: 320px) {
+  .form-tecnico {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .campo-tecnico-inicio,
+  .campo-tecnico-fin {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ===== 19. ESTILOS DE IMPRESIÓN ===== */
 @media print {
-  header, .pasos, .acciones, h1, .sub, .aviso-demo-tag, #avisoFinal, .historial-toggle, details {
+  header, .pasos, .acciones, h1, .sub, #avisoFinal, .historial-toggle, details {
     display: none !important;
   }
   body {
-    background: #ffffff;
+    background: #fff;
     font-size: 12pt;
-    color: #000000;
+    color: #000;
   }
   main {
     max-width: 100%;
@@ -1149,12 +2115,11 @@ input.campo-modificado, select.campo-modificado, textarea.campo-modificado {
   }
   .tarjeta {
     border: none;
-    box-shadow: none;
     padding: 0;
     margin: 0;
   }
   .comprobante {
-    border: 1px solid #000000;
+    border: 1px solid #000;
     padding: 20px;
   }
   .marca-agua {

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modificar datos del evento - Showtech Solutions</title>
+  <link rel="stylesheet" href="assets/vendor/flatpickr/flatpickr.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -24,16 +25,8 @@
 
   <main>
     <div class="encabezado-seccion">
-      <div>
-        <h1>Modificar datos del evento</h1>
-        <p class="sub">Actualice la información del evento, verifique la disponibilidad del auditorio y confirme los cambios en el sistema.</p>
-      </div>
-      <div class="aviso-demo-tag">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-        </svg>
-        <span>Demostración: cambios guardados en este navegador</span>
-      </div>
+      <h1>Modificar datos del evento</h1>
+      <p class="sub">Actualice la información del evento, verifique la disponibilidad del auditorio y confirme los cambios en el sistema.</p>
     </div>
 
     <!-- Barra de 4 Pasos -->
@@ -64,24 +57,29 @@
         <div class="contador-eventos" id="contadorEventos">2 eventos registrados</div>
       </div>
 
-      <div class="tabla-wrap">
+      <div class="tabla-wrap tabla-desktop">
         <table>
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Cliente</th>
-              <th>Evento</th>
-              <th>Fecha</th>
-              <th>Horario del evento</th>
-              <th>Tiempos técnicos</th>
-              <th>Estado</th>
-              <th class="num-der">Acción</th>
+              <th class="th-codigo">Código</th>
+              <th class="th-cliente">Cliente</th>
+              <th class="th-evento">Evento</th>
+              <th class="th-fecha">Fecha</th>
+              <th class="th-horario">Horario</th>
+              <th class="th-tecnicos">Tiempos técnicos</th>
+              <th class="th-estado">Estado</th>
+              <th class="th-accion num-der">Acción</th>
             </tr>
           </thead>
           <tbody id="tablaEventos">
             <!-- Filas inyectadas por JS -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Presentación en tarjetas para dispositivos móviles -->
+      <div class="tarjetas-eventos-movil" id="tarjetasEventosMovil">
+        <!-- Tarjetas inyectadas por JS -->
       </div>
 
       <div class="banner-seleccionado" id="bannerSeleccionado">
@@ -188,109 +186,270 @@
         </div>
 
         <!-- Bloque 2: Fecha y Horario del Evento -->
-        <h3>Fecha y horario del evento</h3>
-        <div class="form">
-          <div>
-            <label for="eventDate">
-              Fecha del evento <span class="req">*</span>
-              <span class="mod-pill" id="modBadgeEventDate">Modificado</span>
-            </label>
-            <input type="date" id="eventDate" required>
-            <span class="msg-error-campo" id="errEventDate"></span>
+        <div class="bloque-fecha-evento">
+          <h3 class="titulo-fecha-evento">Fecha y horario del evento</h3>
+          <div class="insignia-evento-wrap">
+            <span class="badge-tecnico badge-evento">Evento principal</span>
           </div>
+          <div class="form form-evento-principal">
+            <div>
+              <label for="eventDate">
+                Fecha del evento <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeEventDate">Modificado</span>
+              </label>
+              <div class="campo-fecha-wrap" id="wrap_eventDate">
+                <input type="text" id="eventDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" required>
+                <span class="icono-calendario" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
+              </div>
+              <span class="msg-error-campo" id="errEventDate"></span>
+            </div>
 
-          <div>
-            <label for="eventStartTime">
-              Hora de inicio del evento <span class="req">*</span>
-              <span class="mod-pill" id="modBadgeEventStartTime">Modificado</span>
-            </label>
-            <input type="time" id="eventStartTime" min="06:00" max="22:00" required>
-            <span class="msg-error-campo" id="errEventStartTime"></span>
-          </div>
+            <div>
+              <label for="eventStartTime">
+                Hora de inicio del evento <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeEventStartTime">Modificado</span>
+              </label>
+              <div class="campo-hora-wrap" id="wrap_eventStartTime">
+                <input type="text" id="eventStartTime" class="input-hora" placeholder="09:00" autocomplete="off" aria-label="Hora de inicio del evento" value="10:00">
+                <span class="icono-reloj" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <span class="msg-error-campo" id="errEventStartTime"></span>
+            </div>
 
-          <div>
-            <label for="eventEndTime">
-              Hora de fin del evento <span class="req">*</span>
-              <span class="mod-pill" id="modBadgeEventEndTime">Modificado</span>
-            </label>
-            <input type="time" id="eventEndTime" min="06:00" max="22:00" required>
-            <span class="msg-error-campo" id="errEventEndTime"></span>
+            <div>
+              <label for="eventEndTime">
+                Hora de fin del evento <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeEventEndTime">Modificado</span>
+              </label>
+              <div class="campo-hora-wrap" id="wrap_eventEndTime">
+                <input type="text" id="eventEndTime" class="input-hora" placeholder="13:00" autocomplete="off" aria-label="Hora de fin del evento" value="13:00">
+                <span class="icono-reloj" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <span class="msg-error-campo" id="errEventEndTime"></span>
+            </div>
           </div>
+          <p class="ayuda" style="margin-top: 6px;">* Horario regular de funcionamiento del auditorio: 06:00 a 22:00. Evento, montaje y desmontaje deben ocurrir el mismo día.</p>
         </div>
-        <p class="ayuda" style="margin-top: 6px;">* Horario regular de funcionamiento del auditorio: 06:00 a 22:00. Evento, montaje y desmontaje deben ocurrir el mismo día.</p>
 
-        <!-- Bloque 3: Tiempos Adicionales Independientes -->
-        <h3>Tiempos técnicos adicionales (independientes)</h3>
-        <div class="grid-adicionales">
+        <!-- Bloque 3: Tiempos Adicionales -->
+        <h3>Tiempos técnicos adicionales</h3>
+        
+        <!-- Contenedor específico para las 3 tarjetas técnicas apiladas de ancho completo -->
+        <div class="contenedor-tiempos-tecnicos grid-adicionales">
 
           <!-- Montaje Independiente -->
-          <div class="caja-adicional" id="panelMontaje">
-            <label class="check-label" for="chkMontaje">
-              <input type="checkbox" id="chkMontaje">
-              <span>Requiere montaje previo</span>
-            </label>
-            <div class="campos-adicional oculto" id="fieldsMontaje">
-              <label for="montajeStartTime">
-                Hora de inicio del montaje <span class="req">*</span>
-                <span class="mod-pill" id="modBadgeMontajeStart">Modificado</span>
+          <div class="caja-adicional caja-montaje" id="panelMontaje">
+            <div class="caja-adicional-cabecera">
+              <label class="check-label" for="chkMontaje">
+                <input type="checkbox" id="chkMontaje">
+                <span>Requiere montaje previo</span>
               </label>
-              <input type="time" id="montajeStartTime" min="06:00" max="22:00">
-              <span class="ayuda">Finaliza automáticamente al comenzar el evento (mismo día).</span>
-              <span class="msg-error-campo" id="errMontajeStart"></span>
+              <span class="badge-tecnico badge-montaje">Montaje técnico</span>
+            </div>
+            <div class="campos-adicional oculto" id="fieldsMontaje">
+              <div class="form-tecnico">
+                <div class="campo-tecnico-fecha">
+                  <label for="montajeDate">
+                    Fecha&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeMontajeDate">Modificado</span>
+                  </label>
+                  <div class="campo-fecha-wrap" id="wrap_montajeDate">
+                    <input type="text" id="montajeDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" aria-label="Fecha de montaje">
+                    <span class="icono-calendario" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errMontajeDate"></span>
+                </div>
+                <div class="campo-tecnico-inicio">
+                  <label for="montajeStartTime">
+                    Hora de inicio&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeMontajeStart">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_montajeStartTime">
+                    <input type="text" id="montajeStartTime" class="input-hora" placeholder="09:00" autocomplete="off" aria-label="Hora de inicio del montaje" value="09:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errMontajeStart"></span>
+                </div>
+                <div class="campo-tecnico-fin">
+                  <label for="montajeEndTime">
+                    Hora de fin&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeMontajeEnd">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_montajeEndTime">
+                    <input type="text" id="montajeEndTime" class="input-hora" placeholder="10:00" autocomplete="off" aria-label="Hora de fin del montaje" value="10:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errMontajeEnd"></span>
+                </div>
+              </div>
+              <span class="ayuda">* Por defecto finaliza al comenzar el evento.</span>
             </div>
           </div>
 
           <!-- Desmontaje Independiente -->
-          <div class="caja-adicional" id="panelDesmontaje">
-            <label class="check-label" for="chkDesmontaje">
-              <input type="checkbox" id="chkDesmontaje">
-              <span>Requiere desmontaje posterior</span>
-            </label>
-            <div class="campos-adicional oculto" id="fieldsDesmontaje">
-              <label for="desmontajeEndTime">
-                Hora de fin del desmontaje <span class="req">*</span>
-                <span class="mod-pill" id="modBadgeDesmontajeEnd">Modificado</span>
+          <div class="caja-adicional caja-desmontaje" id="panelDesmontaje">
+            <div class="caja-adicional-cabecera">
+              <label class="check-label" for="chkDesmontaje">
+                <input type="checkbox" id="chkDesmontaje">
+                <span>Requiere desmontaje posterior</span>
               </label>
-              <input type="time" id="desmontajeEndTime" min="06:00" max="22:00">
-              <span class="ayuda">Inicia automáticamente al finalizar el evento (mismo día).</span>
-              <span class="msg-error-campo" id="errDesmontajeEnd"></span>
+              <span class="badge-tecnico badge-desmontaje">Desmontaje técnico</span>
+            </div>
+            <div class="campos-adicional oculto" id="fieldsDesmontaje">
+              <div class="form-tecnico">
+                <div class="campo-tecnico-fecha">
+                  <label for="desmontajeDate">
+                    Fecha&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeDesmontajeDate">Modificado</span>
+                  </label>
+                  <div class="campo-fecha-wrap" id="wrap_desmontajeDate">
+                    <input type="text" id="desmontajeDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" aria-label="Fecha de desmontaje">
+                    <span class="icono-calendario" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errDesmontajeDate"></span>
+                </div>
+                <div class="campo-tecnico-inicio">
+                  <label for="desmontajeStartTime">
+                    Hora de inicio&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeDesmontajeStart">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_desmontajeStartTime">
+                    <input type="text" id="desmontajeStartTime" class="input-hora" placeholder="13:00" autocomplete="off" aria-label="Hora de inicio del desmontaje" value="13:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errDesmontajeStart"></span>
+                </div>
+                <div class="campo-tecnico-fin">
+                  <label for="desmontajeEndTime">
+                    Hora de fin&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeDesmontajeEnd">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_desmontajeEndTime">
+                    <input type="text" id="desmontajeEndTime" class="input-hora" placeholder="14:00" autocomplete="off" aria-label="Hora de fin del desmontaje" value="14:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errDesmontajeEnd"></span>
+                </div>
+              </div>
+              <span class="ayuda">* Por defecto inicia al concluir el evento.</span>
             </div>
           </div>
 
           <!-- Ensayo Técnico Previo -->
-          <div class="caja-adicional completo" id="panelEnsayo">
-            <label class="check-label" for="chkEnsayo">
-              <input type="checkbox" id="chkEnsayo">
-              <span>Requiere ensayo técnico previo</span>
-            </label>
+          <div class="caja-adicional caja-ensayo" id="panelEnsayo">
+            <div class="caja-adicional-cabecera">
+              <label class="check-label" for="chkEnsayo">
+                <input type="checkbox" id="chkEnsayo">
+                <span>Requiere ensayo técnico previo</span>
+                <span class="mod-pill" id="modBadgeEnsayoAdded">Ensayo añadido</span>
+              </label>
+              <span class="badge-tecnico badge-ensayo">Ensayo técnico</span>
+            </div>
             <div class="campos-adicional oculto" id="fieldsEnsayo">
-              <div class="form">
-                <div>
+              <div class="form-tecnico">
+                <div class="campo-tecnico-fecha">
                   <label for="ensayoDate">
-                    Fecha del ensayo <span class="req">*</span>
+                    Fecha&nbsp;<span class="req">*</span>
                     <span class="mod-pill" id="modBadgeEnsayoDate">Modificado</span>
                   </label>
-                  <input type="date" id="ensayoDate">
+                  <div class="campo-fecha-wrap" id="wrap_ensayoDate">
+                    <input type="text" id="ensayoDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" aria-label="Fecha del ensayo técnico">
+                    <span class="icono-calendario" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </span>
+                  </div>
                   <span class="msg-error-campo" id="errEnsayoDate"></span>
                 </div>
-                <div>
+                <div class="campo-tecnico-inicio">
                   <label for="ensayoStartTime">
-                    Hora inicio del ensayo <span class="req">*</span>
+                    Hora de inicio&nbsp;<span class="req">*</span>
                     <span class="mod-pill" id="modBadgeEnsayoStart">Modificado</span>
                   </label>
-                  <input type="time" id="ensayoStartTime" min="06:00" max="22:00">
+                  <div class="campo-hora-wrap" id="wrap_ensayoStartTime">
+                    <input type="text" id="ensayoStartTime" class="input-hora" placeholder="08:00" autocomplete="off" aria-label="Hora de inicio del ensayo técnico" value="">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
                   <span class="msg-error-campo" id="errEnsayoStart"></span>
                 </div>
-                <div>
+                <div class="campo-tecnico-fin">
                   <label for="ensayoEndTime">
-                    Hora fin del ensayo <span class="req">*</span>
+                    Hora de fin&nbsp;<span class="req">*</span>
                     <span class="mod-pill" id="modBadgeEnsayoEnd">Modificado</span>
                   </label>
-                  <input type="time" id="ensayoEndTime" min="06:00" max="22:00">
+                  <div class="campo-hora-wrap" id="wrap_ensayoEndTime">
+                    <input type="text" id="ensayoEndTime" class="input-hora" placeholder="09:00" autocomplete="off" aria-label="Hora de fin del ensayo técnico" value="">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
                   <span class="msg-error-campo" id="errEnsayoEnd"></span>
                 </div>
               </div>
-              <span class="ayuda">El ensayo debe finalizar antes del evento y no cruzarse con su montaje ni con otros eventos.</span>
+              <span class="ayuda">* El ensayo debe finalizar antes del evento y no cruzarse con su montaje ni con otros eventos.</span>
             </div>
           </div>
 
@@ -382,13 +541,38 @@
           Revise el resumen de diferencias respecto a los datos registrados antes de confirmar. Puede ingresar un motivo de modificación para auditoría interna.
         </div>
 
-        <!-- Tabla de Diferencias (Diff) -->
-        <h3>Resumen de cambios (Diferencias detectadas)</h3>
-        <div class="tabla-wrap" id="diffTableContainer"></div>
+        <!-- Comparativo en Dos Columnas (Datos actuales vs Cambios propuestos) -->
+        <h3>Comparativo de datos (Actual vs Propuesto)</h3>
+        <div class="comparativo-wrap" id="diffTableContainer"></div>
 
-        <!-- Ficha / Comprobante de Modificación -->
-        <h3>Comprobante de modificación del evento</h3>
-        <div class="comprobante" id="comprobante"></div>
+        <!-- Resumen de Duración e Importe Adicional Estimado -->
+        <div id="durationSummaryContainer"></div>
+
+        <!-- Botón secundario reconocible para alternar la ficha completa -->
+        <div class="ficha-toggle-wrapper">
+          <button type="button" 
+                  class="btn btn-ficha-toggle" 
+                  id="btnToggleFicha" 
+                  aria-expanded="false" 
+                  aria-controls="contenedorFichaCompleta">
+            <svg class="icono-doc" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span id="textoBtnFicha">Ver ficha completa del evento</span>
+            <svg class="icono-flecha" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Contenedor desplegable de la ficha completa (cerrado inicialmente) -->
+        <div class="contenedor-ficha-completa oculto" id="contenedorFichaCompleta" role="region" aria-labelledby="btnToggleFicha">
+          <div class="comprobante" id="comprobante"></div>
+        </div>
 
         <!-- Motivo de la modificación opcional -->
         <div class="form" style="margin-top: 16px;">
@@ -417,6 +601,12 @@
       <div id="vistaExito" class="oculto">
         <div class="comprobante final" id="comprobanteFinal"></div>
         <div class="acciones">
+          <button type="button" class="btn btn-primario" id="btnDescargarPdf">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+            Descargar resumen en PDF
+          </button>
           <button type="button" class="btn btn-sec" onclick="window.print()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/>
@@ -425,7 +615,7 @@
           </button>
           <div class="der">
             <button type="button" class="btn btn-sec" onclick="reiniciar(1)">Volver a la lista de eventos</button>
-            <button type="button" class="btn btn-primario" onclick="reiniciar(2)">Continuar editando este evento</button>
+            <button type="button" class="btn btn-sec" onclick="reiniciar(2)">Continuar editando este evento</button>
           </div>
         </div>
       </div>
@@ -483,6 +673,9 @@
   <!-- Contenedor para Notificaciones Toast Flotantes -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
+  <script src="assets/vendor/flatpickr/flatpickr.min.js"></script>
+  <script src="assets/vendor/flatpickr/es.js"></script>
+  <script src="assets/vendor/jspdf/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
