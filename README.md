@@ -168,4 +168,104 @@ Si prefiere ejecutarlo mediante un servidor HTTP local en PowerShell:
 ```powershell
 python -m http.server 8080
 ```
-Y acceda en su navegador a: `http://localhost:8080/index.html`.
+- Vista del Asesor comercial: `http://localhost:8080/index.html`
+- Vista del Cliente (Portal de Solicitudes): `http://localhost:8080/cliente.html`
+
+---
+
+## 7. Portal del Cliente (`cliente.html`)
+
+### 1. Propósito y Acceso
+El Portal del Cliente permite a los clientes solicitar modificaciones en sus eventos contratados sin alterar directamente la reserva original, sin confirmar disponibilidad definitiva y sin generar deudas ni cobros automáticos.
+- **Archivo principal:** [`cliente.html`](file:///c:/Users/crist/gestor-eventos/cliente.html)
+- **Lógica específica:** [`cliente.js`](file:///c:/Users/crist/gestor-eventos/cliente.js)
+- **Estilos:** Reutiliza [`styles.css`](file:///c:/Users/crist/gestor-eventos/styles.css) manteniendo la identidad Showtech (azul marino `#13264a`, azul secundario `#1f4e9c`, esquinas de 8 px, tarjetas y selectores unificados).
+- **Identidad simulada:** La identidad y separación por cliente están simuladas mediante el identificador estable `CLI-001` (`Promoción Horizonte 2026`). En producción, la autenticación y autorización requerirán integración con un backend seguro y sesiones de usuario.
+
+### 2. Flujo en Cuatro Pasos del Cliente
+
+1. **Paso 1: Mis eventos**
+   - Lista exclusivamente los eventos asociados al cliente autenticado (`EVT-001: Ceremonia de graduación`). No muestra eventos ajenos ni herramientas internas del asesor.
+   - Si no existe una solicitud pendiente, ofrece el botón **“Solicitar modificación”**.
+   - Si ya existe una solicitud en revisión para el evento, bloquea el envío de una segunda solicitud paralela y ofrece **“Ver solicitud en trámite”**.
+   - Sección inferior **“Mis solicitudes de modificación”** con el historial de solicitudes enviadas y su estado.
+
+2. **Paso 2: Proponer cambios**
+   - Muestra los datos de la reserva actual. Código, espacio, cliente y estado son de solo lectura.
+   - Permite proponer cambios en nombre del evento, contacto, teléfono, correo, observaciones, fecha, horarios y tiempos técnicos (montaje, desmontaje y ensayo con casillas independientes).
+   - Ensayo técnico identificado como **“Ensayo añadido”** si no existía previamente, sin marcas falsas de modificación en carga inicial.
+   - Campo obligatorio: **“Motivo de la solicitud”** con validación interactiva.
+   - Exige al menos un cambio efectivo en los datos: escribir solo el motivo sin cambios no permite avanzar.
+   - Comprobación preliminar de disponibilidad: si se detecta colisión con otro evento o bloqueo institucional, se informa al cliente de manera respetuosa y confidencial (sin revelar nombres ni datos de eventos ajenos).
+
+3. **Paso 3: Revisar solicitud**
+   - Comparativo en dos columnas: **“Datos actuales (vigentes)”** frente a **“Cambios solicitados”**, con resaltado de modificaciones y cronograma técnico completo.
+   - Muestra el motivo registrado por el cliente.
+   - **Bloque informativo de costos y tarifas referenciales:**
+     - Cargo administrativo por modificación: **S/ 100**
+     - Hora de auditorio: **S/ 500 / hora**
+     - Mensaje destacado: *“Importe final pendiente de revisión por el asesor comercial. Enviar esta solicitud no genera deudas automáticas ni requiere pagos en este momento.”*
+     - No calcula un total ni asume cobros de montaje/desmontaje/ensayo como horas de evento.
+
+4. **Paso 4: Confirmación**
+   - Botón final **“Enviar solicitud de modificación”** con prevención de doble clic.
+   - Persiste la solicitud en el repositorio compartido `SHOWTECH_SOLICITUDES_V2`.
+   - Muestra correlativo de solicitud (ej. `SOL-2026-643`), fecha/hora de envío y estado **“Pendiente de revisión”**.
+   - Mensaje oficial: *“Tu solicitud fue registrada. El asesor revisará la disponibilidad y el importe aplicable. Tu reserva actual se mantiene hasta que se confirme la modificación.”*
+   - Ofrece **“Ver detalle de la solicitud”** y **“Volver a mis eventos”**.
+
+### 3. Guion de Demostración del Cliente (Paso a Paso)
+
+1. **Abrir el portal del cliente:** Navegue a `http://localhost:8080/cliente.html`.
+2. **Consultar mis eventos:** Verifique que solo aparece `EVT-001` (`Ceremonia de graduación`) para `Promoción Horizonte 2026`. `EVT-002` no es visible.
+3. **Iniciar propuesta:** Haga clic en **“Solicitar modificación”**.
+4. **Verificar estado inicial limpio:** Observe que ningún campo muestra marcas de `Modificado`.
+5. **Comprobar validación de cambios mínimos:** Intente hacer clic en **“Continuar a revisión”**; el sistema exigirá ingresar el motivo y realizar al menos un cambio en los datos.
+6. **Proponer cambios:**
+   - Active la casilla **“Requiere ensayo técnico previo”**; observe la insignia **“Ensayo añadido”** en su cabecera.
+   - Modifique la hora de inicio del evento a `11:00`.
+   - Ingrese un motivo: *“Ajuste de agenda por llegada tardía de la mesa de honor”*.
+7. **Revisar propuesta:** Haga clic en **“Continuar a revisión”**. En el Paso 3, revise la tabla comparativa con los campos modificados resaltados y la tarjeta informativa de costos.
+8. **Enviar solicitud:** Haga clic en **“Enviar solicitud de modificación”**.
+9. **Confirmación:** Observe la pantalla de éxito con el código `SOL-2026-xxx` y el estado *“Pendiente de revisión”*.
+10. **Prevención de duplicados:** Vuelva al Paso 1 y compruebe que el evento ahora muestra la insignia *“Modificación en trámite”* y no permite registrar una segunda solicitud en paralelo.
+11. **Comprobar integridad del asesor:** Abra `http://localhost:8080/index.html` y verifique que `EVT-001` sigue manteniendo sus horarios y reserva original confirmada sin cambios no autorizados.
+
+---
+
+### 4. Opción “Retirar solicitud” (Portal del Cliente)
+- **Ubicación y visibilidad:** En el pie del modal “Detalle de la solicitud”, se muestra el botón secundario **“Retirar solicitud”** (con estilo de borde y texto rojo discreto `.btn-outline-danger`), separado a la izquierda del botón “Cerrar”.
+- **Condición de visualización:** Se muestra **únicamente** cuando la solicitud pertenece al cliente actual (`CLIENTE_ACTUAL`) y se encuentra en estado **“Pendiente de revisión”**. No se muestra para solicitudes retiradas, aprobadas o rechazadas.
+- **Diálogo de confirmación accesible:**
+  - Título: *“Retirar solicitud de modificación”*.
+  - Mensaje: *“¿Deseas retirar esta solicitud? Tu reserva actual se mantendrá sin cambios”*.
+  - Botones: **“Volver”** (cancela la acción sin alterar nada) y **“Sí, retirar solicitud”** (confirma el retiro).
+  - Soporte de teclado: Permite cerrar modales con la tecla `Escape`.
+- **Efectos del retiro y persistencia:**
+  - Re-valida que la solicitud pertenezca al cliente actual y continúe en estado pendiente antes de proceder.
+  - Actualiza el estado a **“Retirada por el cliente”** e incorpora `withdrawnAt` (marca temporal ISO) y `withdrawnDisplayDate` (formato legible para Perú).
+  - **Conservación íntegra:** Se conservan en el historial el código correlativo, motivo, instantánea original de la reserva y cambios propuestos. La solicitud **no se elimina**.
+  - **Integridad de la reserva:** No modifica la reserva original, no altera pagos registrados ni afecta el historial de modificaciones del evento.
+  - **Sin cargos:** La acción de retiro no genera cargos ni penalidades en el prototipo (propuesta pendiente de validación por el ingeniero).
+  - **Prevención de doble clic:** Deshabilita el botón de confirmación durante el procesamiento.
+  - **Tolerancia a fallos de almacenamiento:** Si `localStorage` falla al guardar, se revierte el estado en memoria a "Pendiente de revisión", no se muestra mensaje de éxito y se permite al usuario volver a intentarlo.
+  - **Mensaje de confirmación:** Muestra el toast *“Solicitud retirada. Tu reserva se mantiene sin cambios”* únicamente después de guardar con éxito.
+- **Actualización reactiva de la interfaz:**
+  - El modal de detalle actualiza su estado e incorpora un aviso explicativo con la fecha y hora del retiro.
+  - En la tabla “Mis solicitudes”, la solicitud muestra la insignia gris neutro `Retirada por el cliente`.
+  - La tarjeta del evento en el Paso 1 retira el indicador `Modificación en trámite`.
+  - Se re-habilita inmediatamente el botón **“Solicitar modificación &rarr;”** para dicho evento, permitiendo registrar una nueva propuesta sin impedimentos.
+  - Las solicitudes retiradas pueden seguir consultándose en detalle en cualquier momento.
+
+---
+
+## 8. Reglas Comerciales Pendientes de Confirmación
+
+Se documentan los siguientes puntos comerciales para definición con la gerencia, el ingeniero responsable y el área de operaciones:
+
+1. **Retiro de solicitudes sin cargos (Propuesta pendiente de validación por el ingeniero):** En este prototipo, el retiro de una solicitud de modificación no genera cargos ni penalidades financieras para el cliente. Queda pendiente de validación técnica y comercial por el ingeniero si se debe mantener la gratuidad total del retiro o si aplicará alguna retención/cargo administrativo en caso de que la solicitud haya entrado en etapas avanzadas de evaluación técnica.
+2. **Aplicabilidad del cargo por modificación (S/ 100):** Falta confirmar si el cargo de S/ 100 aplica a todas las solicitudes de cambio o si se exonera en solicitudes realizadas con más de 15 días de anticipación o por motivos de fuerza mayor.
+3. **Facturación de fracciones de hora:** Falta definir si las extensiones de duración en fracciones (ej. 30 o 45 minutos) se prorratean proporcionalmente sobre la tarifa de S/ 500/h o si se redondean a la media hora o a la hora completa siguiente.
+4. **Tarifación de tiempos técnicos adicionales:** Falta determinar si el montaje previo, desmontaje posterior y ensayo técnico tienen una tarifa diferenciada de soporte técnico o si se consideran cortesía según el tipo de paquete contratado.
+5. **Límites de días de montaje/desmontaje:** Falta confirmar si el montaje puede programarse en días calendario previos a la fecha del evento principal o si debe restringirse estrictamente a la misma jornada.
+

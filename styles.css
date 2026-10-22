@@ -2126,3 +2126,315 @@ input.input-error {
     display: none;
   }
 }
+
+/* ===== 20. ESTILOS ESPECÍFICOS DEL PORTAL DEL CLIENTE ===== */
+.header-der .badge-cliente-header {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--blanco);
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.badge-solicitud-pendiente {
+  background: #fff4d6;
+  color: #8a6100;
+  border: 1px solid #f6d17b;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-confirmado {
+  background: #e6f7ef;
+  color: #1e8e5a;
+  border: 1px solid #a3e0c0;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bloque-costos-cliente {
+  background: #f8fafc;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 18px;
+}
+
+.bloque-costos-cliente h4 {
+  color: var(--primario);
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.costos-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.costo-item-card {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.costo-item-card .costo-label {
+  font-size: 12px;
+  color: var(--gris);
+  display: block;
+}
+
+.costo-item-card .costo-valor {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--primario);
+}
+
+.confirmacion-exito-box {
+  background: var(--blanco);
+  border: 1px solid #a3e0c0;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.confirmacion-exito-box .icono-check-grande {
+  width: 48px;
+  height: 48px;
+  color: var(--ok);
+  margin: 0 auto 12px;
+  display: block;
+}
+
+.confirmacion-exito-box h3 {
+  color: var(--primario);
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.confirmacion-exito-box p {
+  color: var(--texto);
+  font-size: 14px;
+  max-width: 650px;
+  margin: 0 auto 16px;
+  line-height: 1.5;
+}
+
+.confirmacion-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 14px;
+  text-align: left;
+  margin-top: 16px;
+}
+
+.confirmacion-meta-item small {
+  display: block;
+  color: var(--gris);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confirmacion-meta-item strong {
+  font-size: 14px;
+  color: var(--primario);
+}
+
+.seccion-solicitudes {
+  margin-top: 24px;
+  border-top: 1px solid var(--borde);
+  padding-top: 20px;
+}
+
+.seccion-solicitudes h3 {
+  font-size: 16px;
+  color: var(--primario);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tabla-solicitudes th,
+.tabla-solicitudes td {
+  padding: 10px 12px;
+}
+
+.badge-solicitud-codigo {
+  font-family: monospace;
+  font-weight: bold;
+  background: var(--suave);
+  color: var(--primario);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.motivo-box-review {
+  background: var(--suave);
+  border-left: 4px solid var(--primario-2);
+  padding: 12px 14px;
+  border-radius: 0 6px 6px 0;
+  margin: 16px 0;
+  font-size: 13.5px;
+}
+
+.motivo-box-review strong {
+  color: var(--primario);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tarjeta-evento-cliente {
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--blanco);
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.tarjeta-evento-cliente:hover {
+  border-color: var(--primario-2);
+  box-shadow: 0 2px 8px rgba(19, 38, 74, 0.06);
+}
+
+.tarjeta-evento-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tarjeta-evento-cabecera h3 {
+  font-size: 16px;
+  color: var(--primario);
+  margin: 0;
+}
+
+.tarjeta-evento-detalles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  background: var(--fondo);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.tarjeta-evento-detalles-item small {
+  display: block;
+  color: var(--gris);
+  font-size: 11px;
+}
+
+.tarjeta-evento-detalles-item strong {
+  color: var(--texto);
+}
+
+.tarjeta-evento-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.modal-footer.modal-footer-between {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-outline-danger {
+  background: var(--blanco);
+  border: 1px solid var(--error);
+  color: var(--error);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-outline-danger:hover {
+  background: #fdf2f2;
+  border-color: #a82d20;
+  color: #a82d20;
+}
+
+.btn-outline-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.badge-solicitud-retirada {
+  background: #f1f3f8;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-solicitud-rechazada {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 480px) {
+  .modal-footer.modal-footer-between {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .modal-footer.modal-footer-between .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+

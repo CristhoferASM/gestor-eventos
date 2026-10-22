@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal del Cliente - Modificar datos del evento - Showtech Solutions</title>
+  <link rel="stylesheet" href="assets/vendor/flatpickr/flatpickr.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Encabezado Showtech Solutions - Portal del Cliente -->
+  <header>
+    <div class="marca">SHOWTECH <span>SOLUTIONS</span></div>
+    <div class="header-der">
+      <span class="usuario">Usuario: Cliente</span>
+      <span class="badge-cliente-header">Promoción Horizonte 2026</span>
+      <a href="index.html" class="btn-demo" title="Cambiar a vista del asesor comercial">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7.5" r="4"></circle>
+          <polyline points="17 11 19 13 23 9"></polyline>
+        </svg>
+        <span>Vista Asesor &rarr;</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="encabezado-seccion">
+      <h1>Solicitud de modificación de evento</h1>
+      <p class="sub">Consulte sus reservas, proponga cambios en fechas, horarios o requerimientos y envíe su solicitud para evaluación del asesor comercial.</p>
+    </div>
+
+    <!-- Barra de 4 Pasos del Cliente -->
+    <div class="pasos" role="tablist">
+      <div class="paso clic activo" id="cp1" onclick="irPasoCliente(1)" role="tab" aria-selected="true">
+        <span class="num">1</span>Mis eventos
+      </div>
+      <div class="paso clic" id="cp2" onclick="irPasoCliente(2)" role="tab" aria-selected="false">
+        <span class="num">2</span>Proponer cambios
+      </div>
+      <div class="paso clic" id="cp3" onclick="irPasoCliente(3)" role="tab" aria-selected="false">
+        <span class="num">3</span>Revisar solicitud
+      </div>
+      <div class="paso clic" id="cp4" onclick="irPasoCliente(4)" role="tab" aria-selected="false">
+        <span class="num">4</span>Confirmación
+      </div>
+    </div>
+
+    <!-- =====================================================================
+         PASO 1: MIS EVENTOS
+         ===================================================================== -->
+    <section class="tarjeta" id="cs1">
+      <h2>1. Mis eventos contratados</h2>
+      <p class="ayuda" style="margin-bottom: 16px;">Seleccione el evento en el cual desea solicitar un cambio. Su reserva actual se mantendrá confirmada y vigente hasta que el asesor comercial evalúe y apruebe la modificación.</p>
+
+      <!-- Lista de eventos del cliente -->
+      <div id="listaEventosCliente">
+        <!-- Renderizado dinámicamente por cliente.js -->
+      </div>
+
+      <!-- Sección de Solicitudes Realizadas -->
+      <div class="seccion-solicitudes" id="seccionSolicitudes">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Mis solicitudes de modificación
+        </h3>
+        <div id="contenedorSolicitudesCliente">
+          <!-- Renderizado dinámicamente -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         PASO 2: PROPONER CAMBIOS
+         ===================================================================== -->
+    <section class="tarjeta oculto" id="cs2">
+      <div class="tarjeta-cabecera-flex">
+        <h2>2. Proponer cambios para el evento</h2>
+        <div class="etiqueta et-evento-activo" id="badgeEventoClientePaso2">EVT-001 • Confirmado</div>
+      </div>
+
+      <div class="aviso aviso-info" style="margin-bottom: 16px;">
+        Puede proponer ajustes en los datos generales, fecha, horarios y tiempos técnicos de su evento. Debe indicar un <strong>motivo de solicitud</strong> y proponer al menos un cambio efectivo antes de continuar.
+      </div>
+
+      <form id="formPropuestaCliente" novalidate onsubmit="return false;">
+
+        <!-- Bloque 1: Información General y Contacto -->
+        <h3>Información general y contacto</h3>
+        <div class="form">
+          <div>
+            <label for="eventCode">Código del evento</label>
+            <input type="text" id="eventCode" readonly class="input-readonly">
+            <span class="ayuda">Identificador de su reserva (solo lectura).</span>
+          </div>
+
+          <div>
+            <label for="eventSpace">Auditorio asignado</label>
+            <input type="text" id="eventSpace" value="Auditorio Showtech" readonly class="input-readonly">
+            <span class="ayuda">Espacio contratado (solo lectura).</span>
+          </div>
+
+          <div>
+            <label for="eventClient">Cliente / Razón Social</label>
+            <input type="text" id="eventClient" readonly class="input-readonly">
+            <span class="ayuda">Titular del contrato (solo lectura).</span>
+          </div>
+
+          <div class="completo">
+            <label for="eventName">
+              Nombre de la convocatoria o evento <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventName">Modificado</span>
+            </label>
+            <input type="text" id="eventName" required maxlength="120" placeholder="Ej. Ceremonia de graduación">
+            <span class="msg-error-campo" id="errEventName"></span>
+          </div>
+
+          <div>
+            <label for="eventContact">
+              Persona de contacto <span class="req">*</span>
+              <span class="mod-pill" id="modBadgeEventContact">Modificado</span>
+            </label>
+            <input type="text" id="eventContact" required maxlength="80" placeholder="Nombre de la persona responsable">
+            <span class="msg-error-campo" id="errEventContact"></span>
+          </div>
+
+          <div>
+            <label for="eventPhone">
+              Teléfono de contacto
+              <span class="mod-pill" id="modBadgeEventPhone">Modificado</span>
+            </label>
+            <input type="tel" id="eventPhone" maxlength="25" placeholder="Ej. 998 765 432">
+          </div>
+
+          <div class="completo">
+            <label for="eventEmail">
+              Correo electrónico
+              <span class="mod-pill" id="modBadgeEventEmail">Modificado</span>
+            </label>
+            <input type="email" id="eventEmail" maxlength="80" placeholder="Ej. contacto@cliente.edu.pe">
+          </div>
+
+          <div class="completo">
+            <label for="eventNotes">
+              Observaciones y requerimientos técnicos <span class="opc">(opcional)</span>
+              <span class="mod-pill" id="modBadgeEventNotes">Modificado</span>
+            </label>
+            <textarea id="eventNotes" rows="2" maxlength="300" placeholder="Requerimientos de audio, micrófonos, pantalla LED, distribución, etc."></textarea>
+          </div>
+        </div>
+
+        <!-- Bloque 2: Fecha y Horario del Evento -->
+        <div class="bloque-fecha-evento">
+          <h3 class="titulo-fecha-evento">Fecha y horario del evento</h3>
+          <div class="insignia-evento-wrap">
+            <span class="badge-tecnico badge-evento">Evento principal</span>
+          </div>
+          <div class="form form-evento-principal">
+            <div>
+              <label for="eventDate">
+                Fecha del evento <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeEventDate">Modificado</span>
+              </label>
+              <div class="campo-fecha-wrap" id="wrap_eventDate">
+                <input type="text" id="eventDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" required>
+                <span class="icono-calendario" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
+              </div>
+              <span class="msg-error-campo" id="errEventDate"></span>
+            </div>
+
+            <div>
+              <label for="eventStartTime">
+                Hora de inicio del evento <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeEventStartTime">Modificado</span>
+              </label>
+              <div class="campo-hora-wrap" id="wrap_eventStartTime">
+                <input type="text" id="eventStartTime" class="input-hora" placeholder="09:00" autocomplete="off" aria-label="Hora de inicio del evento" value="10:00">
+                <span class="icono-reloj" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <span class="msg-error-campo" id="errEventStartTime"></span>
+            </div>
+
+            <div>
+              <label for="eventEndTime">
+                Hora de fin del evento <span class="req">*</span>
+                <span class="mod-pill" id="modBadgeEventEndTime">Modificado</span>
+              </label>
+              <div class="campo-hora-wrap" id="wrap_eventEndTime">
+                <input type="text" id="eventEndTime" class="input-hora" placeholder="13:00" autocomplete="off" aria-label="Hora de fin del evento" value="13:00">
+                <span class="icono-reloj" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <span class="msg-error-campo" id="errEventEndTime"></span>
+            </div>
+          </div>
+          <p class="ayuda" style="margin-top: 6px;">* Horario regular de funcionamiento del auditorio: 06:00 a 22:00. Evento, montaje y desmontaje deben ocurrir el mismo día.</p>
+        </div>
+
+        <!-- Bloque 3: Tiempos Técnicos Adicionales -->
+        <h3>Tiempos técnicos adicionales</h3>
+        
+        <div class="contenedor-tiempos-tecnicos grid-adicionales">
+
+          <!-- Montaje Independiente -->
+          <div class="caja-adicional caja-montaje" id="panelMontaje">
+            <div class="caja-adicional-cabecera">
+              <label class="check-label" for="chkMontaje">
+                <input type="checkbox" id="chkMontaje">
+                <span>Requiere montaje previo</span>
+              </label>
+              <span class="badge-tecnico badge-montaje">Montaje técnico</span>
+            </div>
+            <div class="campos-adicional oculto" id="fieldsMontaje">
+              <div class="form-tecnico">
+                <div class="campo-tecnico-fecha">
+                  <label for="montajeDate">
+                    Fecha&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeMontajeDate">Modificado</span>
+                  </label>
+                  <div class="campo-fecha-wrap" id="wrap_montajeDate">
+                    <input type="text" id="montajeDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" aria-label="Fecha de montaje">
+                    <span class="icono-calendario" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errMontajeDate"></span>
+                </div>
+                <div class="campo-tecnico-inicio">
+                  <label for="montajeStartTime">
+                    Hora de inicio&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeMontajeStart">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_montajeStartTime">
+                    <input type="text" id="montajeStartTime" class="input-hora" placeholder="09:00" autocomplete="off" aria-label="Hora de inicio del montaje" value="09:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errMontajeStart"></span>
+                </div>
+                <div class="campo-tecnico-fin">
+                  <label for="montajeEndTime">
+                    Hora de fin&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeMontajeEnd">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_montajeEndTime">
+                    <input type="text" id="montajeEndTime" class="input-hora" placeholder="10:00" autocomplete="off" aria-label="Hora de fin del montaje" value="10:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errMontajeEnd"></span>
+                </div>
+              </div>
+              <span class="ayuda">* Por defecto finaliza al comenzar el evento.</span>
+            </div>
+          </div>
+
+          <!-- Desmontaje Independiente -->
+          <div class="caja-adicional caja-desmontaje" id="panelDesmontaje">
+            <div class="caja-adicional-cabecera">
+              <label class="check-label" for="chkDesmontaje">
+                <input type="checkbox" id="chkDesmontaje">
+                <span>Requiere desmontaje posterior</span>
+              </label>
+              <span class="badge-tecnico badge-desmontaje">Desmontaje técnico</span>
+            </div>
+            <div class="campos-adicional oculto" id="fieldsDesmontaje">
+              <div class="form-tecnico">
+                <div class="campo-tecnico-fecha">
+                  <label for="desmontajeDate">
+                    Fecha&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeDesmontajeDate">Modificado</span>
+                  </label>
+                  <div class="campo-fecha-wrap" id="wrap_desmontajeDate">
+                    <input type="text" id="desmontajeDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" aria-label="Fecha de desmontaje">
+                    <span class="icono-calendario" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errDesmontajeDate"></span>
+                </div>
+                <div class="campo-tecnico-inicio">
+                  <label for="desmontajeStartTime">
+                    Hora de inicio&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeDesmontajeStart">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_desmontajeStartTime">
+                    <input type="text" id="desmontajeStartTime" class="input-hora" placeholder="13:00" autocomplete="off" aria-label="Hora de inicio del desmontaje" value="13:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errDesmontajeStart"></span>
+                </div>
+                <div class="campo-tecnico-fin">
+                  <label for="desmontajeEndTime">
+                    Hora de fin&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeDesmontajeEnd">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_desmontajeEndTime">
+                    <input type="text" id="desmontajeEndTime" class="input-hora" placeholder="14:00" autocomplete="off" aria-label="Hora de fin del desmontaje" value="14:00">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errDesmontajeEnd"></span>
+                </div>
+              </div>
+              <span class="ayuda">* Por defecto inicia al concluir el evento.</span>
+            </div>
+          </div>
+
+          <!-- Ensayo Técnico Previo -->
+          <div class="caja-adicional caja-ensayo" id="panelEnsayo">
+            <div class="caja-adicional-cabecera">
+              <label class="check-label" for="chkEnsayo">
+                <input type="checkbox" id="chkEnsayo">
+                <span>Requiere ensayo técnico previo</span>
+                <span class="mod-pill" id="modBadgeEnsayoAdded">Ensayo añadido</span>
+              </label>
+              <span class="badge-tecnico badge-ensayo">Ensayo técnico</span>
+            </div>
+            <div class="campos-adicional oculto" id="fieldsEnsayo">
+              <div class="form-tecnico">
+                <div class="campo-tecnico-fecha">
+                  <label for="ensayoDate">
+                    Fecha&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeEnsayoDate">Modificado</span>
+                  </label>
+                  <div class="campo-fecha-wrap" id="wrap_ensayoDate">
+                    <input type="text" id="ensayoDate" class="input-fecha" placeholder="dd/mm/aaaa" autocomplete="off" aria-label="Fecha del ensayo técnico">
+                    <span class="icono-calendario" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errEnsayoDate"></span>
+                </div>
+                <div class="campo-tecnico-inicio">
+                  <label for="ensayoStartTime">
+                    Hora de inicio&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeEnsayoStart">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_ensayoStartTime">
+                    <input type="text" id="ensayoStartTime" class="input-hora" placeholder="08:00" autocomplete="off" aria-label="Hora de inicio del ensayo técnico" value="">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errEnsayoStart"></span>
+                </div>
+                <div class="campo-tecnico-fin">
+                  <label for="ensayoEndTime">
+                    Hora de fin&nbsp;<span class="req">*</span>
+                    <span class="mod-pill" id="modBadgeEnsayoEnd">Modificado</span>
+                  </label>
+                  <div class="campo-hora-wrap" id="wrap_ensayoEndTime">
+                    <input type="text" id="ensayoEndTime" class="input-hora" placeholder="09:00" autocomplete="off" aria-label="Hora de fin del ensayo técnico" value="">
+                    <span class="icono-reloj" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <span class="msg-error-campo" id="errEnsayoEnd"></span>
+                </div>
+              </div>
+              <span class="ayuda">* El ensayo debe finalizar antes del evento y no cruzarse con su montaje ni con otros eventos.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Cronograma resumido del horario propuesto -->
+        <div class="resumen-horario-box" id="resumenHorarioBoxCliente">
+          <div class="resumen-horario-titulo">Cronograma propuesto:</div>
+          <div class="resumen-horario-items" id="resumenHorarioItemsCliente"></div>
+        </div>
+
+        <!-- Bloque 4: Motivo de la Solicitud (OBLIGATORIO) -->
+        <div class="form" style="margin-top: 18px;">
+          <div class="completo">
+            <label for="requestReason">
+              Motivo de la solicitud de modificación <span class="req">*</span>
+            </label>
+            <textarea id="requestReason" rows="3" required placeholder="Explique la razón del cambio (ej. Ajuste de agenda de los ponentes principales, extensión de ceremonia, necesidad de ensayo previo...)" maxlength="400"></textarea>
+            <span class="msg-error-campo" id="errRequestReason"></span>
+            <span class="ayuda">Esta información es indispensable para que el asesor comercial evalúe la viabilidad de la solicitud.</span>
+          </div>
+        </div>
+
+        <div class="msg-error" id="errorPaso2Cliente"></div>
+
+        <!-- Acciones del Paso 2 -->
+        <div class="acciones">
+          <button type="button" class="btn btn-sec" onclick="volverPaso1ConConfirmacion()">&larr; Volver a mis eventos</button>
+          
+          <div class="der">
+            <button type="button" class="btn btn-sec" id="btnDescartarPaso2Cliente">
+              Descartar cambios
+            </button>
+            <button type="button" class="btn btn-primario" id="btnAvanzarPaso3Cliente">
+              Continuar a revisión &rarr;
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- =====================================================================
+         PASO 3: REVISAR SOLICITUD
+         ===================================================================== -->
+    <section class="tarjeta oculto" id="cs3">
+      <h2>3. Revisar solicitud de modificación</h2>
+      
+      <div class="aviso aviso-info">
+        Revise el detalle comparativo entre los datos actuales de su evento y los cambios que enviará al equipo comercial.
+      </div>
+
+      <!-- Comparativo en Dos Columnas (Datos actuales vs Cambios solicitados) -->
+      <h3>Comparativo de cambios solicitados</h3>
+      <div class="comparativo-wrap" id="diffTableContainerCliente"></div>
+
+      <!-- Motivo Registrado -->
+      <div class="motivo-box-review" id="motivoReviewBox">
+        <strong>Motivo de la solicitud:</strong>
+        <p id="motivoReviewTexto"></p>
+      </div>
+
+      <!-- Bloque Informativo de Costos y Tarifas -->
+      <div class="bloque-costos-cliente">
+        <h4>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Información tarifaria y condiciones de modificación
+        </h4>
+        <div class="costos-items-grid">
+          <div class="costo-item-card">
+            <span class="costo-label">Cargo por modificación</span>
+            <span class="costo-valor">S/ 100</span>
+          </div>
+          <div class="costo-item-card">
+            <span class="costo-label">Hora adicional de auditorio</span>
+            <span class="costo-valor">S/ 500 / hora</span>
+          </div>
+        </div>
+        <div class="aviso aviso-info" style="margin-bottom: 0;">
+          <strong>Importe final pendiente de revisión por el asesor</strong><br>
+          Las tarifas mostradas son referenciales. El asesor comercial confirmará si aplica el cargo de modificación de acuerdo con la anticipación de la solicitud y liquidará el importe exacto según las horas y servicios técnicos aprobados.
+          <br><small style="margin-top: 4px; display: block; color: var(--gris);">* Enviar esta solicitud no genera deudas automáticas ni requiere pagos en este paso.</small>
+        </div>
+      </div>
+
+      <div class="msg-error" id="errorPaso3Cliente"></div>
+
+      <!-- Acciones del Paso 3 -->
+      <div class="acciones">
+        <button type="button" class="btn btn-sec" onclick="irPasoCliente(2)">&larr; Modificar propuesta</button>
+        <div class="der">
+          <button type="button" class="btn btn-ok" id="btnEnviarSolicitud">
+            Enviar solicitud de modificación &rarr;
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         PASO 4: CONFIRMACIÓN DE SOLICITUD
+         ===================================================================== -->
+    <section class="tarjeta oculto" id="cs4">
+      <div class="confirmacion-exito-box">
+        <svg class="icono-check-grande" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+
+        <span class="badge-solicitud-pendiente" style="margin-bottom: 8px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Pendiente de revisión
+        </span>
+
+        <h3>¡Tu solicitud fue registrada con éxito!</h3>
+        <p>Tu solicitud fue registrada. El asesor revisará la disponibilidad y el importe aplicable. Tu reserva actual se mantiene hasta que se confirme la modificación.</p>
+
+        <div class="confirmacion-meta-grid" id="confirmacionMetaGrid">
+          <!-- Datos inyectados por JS -->
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button type="button" class="btn btn-sec" id="btnVerDetalleSolicitudConfirmada">
+          Ver detalle de la solicitud
+        </button>
+        <div class="der">
+          <button type="button" class="btn btn-primario" onclick="irPasoCliente(1)">
+            Volver a mis eventos &rarr;
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================================
+       MODALES
+       ===================================================================== -->
+
+  <!-- Modal Detalle de Solicitud (Consultar estado y cambios) -->
+  <div class="modal-overlay oculto" id="modalDetalleSolicitud" role="dialog" aria-modal="true" aria-labelledby="modalDetalleTitle">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalDetalleTitle">Detalle de la solicitud</h3>
+        <button type="button" class="modal-close-btn" id="btnCloseModalDetalle" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalDetalleBody">
+        <!-- Contenido inyectado dinámicamente -->
+      </div>
+      <div class="modal-footer modal-footer-between" id="modalDetalleFooter">
+        <button type="button" class="btn btn-outline-danger oculto" id="btnRetirarSolicitudModal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Retirar solicitud</span>
+        </button>
+        <button type="button" class="btn btn-sec" id="btnCerrarModalDetalle">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmación para Retirar Solicitud -->
+  <div class="modal-overlay oculto" id="modalConfirmarRetiro" role="dialog" aria-modal="true" aria-labelledby="modalRetiroTitle">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalRetiroTitle">Retirar solicitud de modificación</h3>
+        <button type="button" class="modal-close-btn" id="btnCloseModalRetiro" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14.5px; color: var(--texto); line-height: 1.5; margin-bottom: 8px;">¿Deseas retirar esta solicitud? Tu reserva actual se mantendrá sin cambios.</p>
+        <p style="font-size: 12.5px; color: var(--gris); line-height: 1.4;">Esta acción cambiará el estado de la propuesta a “Retirada por el cliente”. La solicitud permanecerá registrada en tu historial y podrás formular una nueva solicitud cuando lo requieras.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sec" id="btnCancelarRetiro">Volver</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmarRetiroSolicitud">Sí, retirar solicitud</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirmación para Descartar Cambios -->
+  <div class="modal-overlay oculto" id="modalDescartarCliente" role="dialog" aria-modal="true" aria-labelledby="modalDiscardClientTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalDiscardClientTitle">¿Descartar cambios propuestos?</h3>
+        <button type="button" class="modal-close-btn" id="btnCloseDiscardClientModal" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="discardClientMessage">Tiene modificaciones en el formulario que aún no ha enviado. Si continúa, se descartarán todos los cambios propuestos y se restaurarán los valores actuales de su reserva.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sec" id="btnStayOnClientForm">Continuar editando</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmDiscardClient">Descartar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor para Notificaciones Toast Flotantes -->
+  <div class="toast-container" id="toastContainerCliente" aria-live="polite"></div>
+
+  <script src="assets/vendor/flatpickr/flatpickr.min.js"></script>
+  <script src="assets/vendor/flatpickr/es.js"></script>
+  <script src="cliente.js"></script>
+</body>
+</html>
