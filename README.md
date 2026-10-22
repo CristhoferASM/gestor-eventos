@@ -259,13 +259,77 @@ El Portal del Cliente permite a los clientes solicitar modificaciones en sus eve
 
 ---
 
-## 8. Reglas Comerciales Pendientes de Confirmación
+## 8. Gestión de Adicionales del Evento (Vista Asesor y Portal del Cliente)
+
+### 1. Aclaración Importante sobre las Tarifas
+> [!NOTE]
+> **Tarifas simuladas y configurables para el prototipo:**
+> Todos los precios de adicionales indicados en el sistema son datos de ejemplo y simulación técnica proporcionados por el ingeniero para evaluar el flujo operativo y de cálculo del prototipo.
+> - **No representan precios oficiales ni tarifas aprobadas** por la administración de Showtech Solutions S.A.C.
+> - Se encuentran centralizados en una estructura compartida y configurable para su posterior sustitución por las tarifas comerciales definitivas una vez aprobadas.
+> - Tanto en los formularios, en los comparativos de revisión (Asesor y Cliente) como en el PDF de resumen se incluye de forma visible pero discreta la nota: *“Importes referenciales para el prototipo”*.
+
+### 2. Catálogo Compartido de Adicionales
+Se implementó un catálogo con identificadores estables y tarifas horarias de simulación:
+| Identificador | Nombre del Adicional | Tarifa Simulada | Unidad Comercial |
+| :--- | :--- | :--- | :--- |
+| `cochera` | **Cochera** | S/ 10.00 / hora | *Cantidad de unidades* (pendiente confirmar si vehículo o espacio) |
+| `pantalla_5x4` | **Pantalla LED 5×4** | S/ 200.00 / hora | Cantidad de pantallas |
+| `pantalla_4x3` | **Pantalla LED 4×3** | S/ 150.00 / hora | Cantidad de pantallas |
+| `microfono` | **Micrófono** | S/ 5.00 / hora | Cantidad de micrófonos |
+| `teleprompter` | **Teleprompter** | S/ 10.00 / hora | Cantidad de equipos |
+
+### 3. Sección del Formulario (Paso 2: Tiempos del evento)
+Ubicada inmediatamente después de los tiempos técnicos (montaje, desmontaje y ensayo):
+- **Campos del formulario:**
+  - Selector desplegable de adicional disponible.
+  - Campo numérico para **Cantidad de unidades** (números enteros positivos $\ge 1$).
+  - Campo numérico para **Horas de uso** (números enteros positivos $\ge 1$). Horas explícitas y no condicionadas automáticamente a la duración del evento o montajes.
+  - Tarifa por hora de solo lectura en soles (`S/ XX.XX`).
+  - Previsualización en vivo del subtotal calculado (`S/ XX.XX`).
+  - Botón interactivo **“Agregar adicional”** (se conmuta a **“Actualizar adicional”** y botón **“Cancelar edición”** al editar un registro).
+- **Tabla interactiva de adicionales:**
+  - Columnas: `Adicional | Cantidad | Horas de uso | Tarifa por hora | Subtotal | Acciones`.
+  - **Sin duplicidad de filas:** Si el usuario selecciona un adicional que ya está en la lista, el sistema actualiza la fila existente en lugar de duplicarla.
+  - **Acciones disponibles:** Botón "Editar" (carga los valores en el mini-formulario superior) y botón "Quitar" (elimina el adicional de la lista).
+  - **Fórmulas de cálculo:**
+    $$\text{Subtotal} = \text{Cantidad} \times \text{Horas de uso} \times \text{Tarifa por hora}$$
+    $$\text{Total Adicionales} = \sum \text{Subtotales}$$
+  - En la parte inferior de la tabla se visualiza el **Total de adicionales**, con formato monetario peruano (`S/ 0.00`).
+
+### 4. Lógica en la Vista del Asesor Comercial (`index.html` / `script.js`)
+- **Precarga de adicionales:** Carga los adicionales existentes guardados en el evento. Si el evento es previo y no tenía adicionales registrados, se inicializa como una lista vacía `[]` de forma segura.
+- **Detección inteligente de cambios:** Modificar la lista de adicionales (agregar, editar o quitar) se detecta como un cambio pendiente efectivo.
+- **Sin validación forzada de auditorio cuando solo cambian adicionales:** Si únicamente cambian los adicionales o datos generales y no se modifican las fechas ni horas del auditorio/técnicos, el botón *“Revisar y confirmar directo &rarr;”* permite avanzar inmediatamente al Paso 4 sin exigir revalidar la disponibilidad de la sala.
+- **Cuadro comparativo en Paso 4 (Revisión):**
+  - Muestra una tarjeta dedicada con la comparación entre **“Adicionales actuales contratados”** vs **“Adicionales propuestos”**.
+  - Detalle fila por fila con badge de variación (`Nuevo`, `Modificado`, `Sin cambios`).
+  - Muestra claramente: **Total actual de adicionales**, **Total propuesto de adicionales** y la **Diferencia**.
+  - **Tratamiento de reducción (diferencia negativa):** Se etiqueta explícitamente como *“Reducción propuesta”* sin generar devolución automática ni saldos inventados.
+- **Guardado atómico y persistencia:** Los adicionales propuestos se guardan en el evento únicamente cuando el asesor confirma definitivamente en el Paso 4. Se persisten con su ID, nombre, cantidad, horas, tarifa y subtotal.
+- **Historial y PDF:** Se incorporan en el historial de modificaciones del evento y se desglosan en el PDF de resumen descargable con la nota referencial de prototipo.
+
+### 5. Lógica en el Portal del Cliente (`cliente.html` / `cliente.js`)
+- **Propuesta independiente y segura:** El cliente puede visualizar los adicionales vigentes y proponer adiciones, modificaciones o eliminaciones.
+- **Cambio válido para solicitar:** Modificar adicionales se reconoce como un cambio real en el formulario, permitiendo avanzar al Paso 3 y enviar la solicitud con su respectivo motivo, incluso si no varían los horarios.
+- **Separación estricta de la reserva:** Los adicionales solicitados se guardan dentro de `proposedChanges.adicionales` en el registro de solicitud (`SHOWTECH_SOLICITUDES_V2`). La reserva confirmada en `SHOWTECH_EVENTOS_V2` permanece inalterada hasta la aprobación del asesor.
+- **Retiro de solicitud:** Retirar la solicitud de modificación no altera los adicionales confirmados de la reserva.
+- **Regla de una sola solicitud pendiente:** Se mantiene el bloqueo para evitar múltiples solicitudes simultáneas en trámite para un mismo evento.
+- **Presentación de importes:** Todos los importes en la vista del cliente se identifican como *“Propuesta sujeta a revisión comercial”* y se conserva el aviso oficial: *“Importe final pendiente de revisión por el asesor comercial. Enviar esta solicitud no genera deudas automáticas ni requiere pagos en este momento.”*
+
+---
+
+## 9. Reglas Comerciales Pendientes de Confirmación
 
 Se documentan los siguientes puntos comerciales para definición con la gerencia, el ingeniero responsable y el área de operaciones:
 
-1. **Retiro de solicitudes sin cargos (Propuesta pendiente de validación por el ingeniero):** En este prototipo, el retiro de una solicitud de modificación no genera cargos ni penalidades financieras para el cliente. Queda pendiente de validación técnica y comercial por el ingeniero si se debe mantener la gratuidad total del retiro o si aplicará alguna retención/cargo administrativo en caso de que la solicitud haya entrado en etapas avanzadas de evaluación técnica.
-2. **Aplicabilidad del cargo por modificación (S/ 100):** Falta confirmar si el cargo de S/ 100 aplica a todas las solicitudes de cambio o si se exonera en solicitudes realizadas con más de 15 días de anticipación o por motivos de fuerza mayor.
-3. **Facturación de fracciones de hora:** Falta definir si las extensiones de duración en fracciones (ej. 30 o 45 minutos) se prorratean proporcionalmente sobre la tarifa de S/ 500/h o si se redondean a la media hora o a la hora completa siguiente.
-4. **Tarifación de tiempos técnicos adicionales:** Falta determinar si el montaje previo, desmontaje posterior y ensayo técnico tienen una tarifa diferenciada de soporte técnico o si se consideran cortesía según el tipo de paquete contratado.
-5. **Límites de días de montaje/desmontaje:** Falta confirmar si el montaje puede programarse en días calendario previos a la fecha del evento principal o si debe restringirse estrictamente a la misma jornada.
+1. **Unidad comercial para cochera:** Falta confirmar si la unidad comercial de cobro corresponde a vehículo particular o a espacio reservado en la zona de estacionamiento.
+2. **Fracciones de hora en adicionales:** Para esta primera entrega se aplican cantidades y horas enteras positivas. Queda pendiente de confirmación la política oficial respecto al cobro o prorrateo de fracciones de hora en equipos y servicios adicionales (no se aplican redondeos arbitrarios en el prototipo).
+3. **Tarifas oficiales definitivas:** Las tarifas utilizadas (`S/ 10`, `S/ 200`, `S/ 150`, `S/ 5`, `S/ 10`) son valores referenciales de simulación técnica y deben ser sustituidas por el tarifario oficial aprobado por gerencia.
+4. **Retiro de solicitudes sin cargos (Propuesta pendiente de validación por el ingeniero):** En este prototipo, el retiro de una solicitud de modificación no genera cargos ni penalidades financieras para el cliente. Queda pendiente de validación técnica y comercial por el ingeniero si se debe mantener la gratuidad total del retiro o si aplicará alguna retención/cargo administrativo en caso de que la solicitud haya entrado en etapas avanzadas de evaluación técnica.
+5. **Aplicabilidad del cargo por modificación (S/ 100):** Falta confirmar si el cargo de S/ 100 aplica a todas las solicitudes de cambio o si se exonera en solicitudes realizadas con más de 15 días de anticipación o por motivos de fuerza mayor.
+6. **Facturación de fracciones de hora del auditorio:** Falta definir si las extensiones de duración en fracciones (ej. 30 o 45 minutos) se prorratean proporcionalmente sobre la tarifa de S/ 500/h o si se redondean a la media hora o a la hora completa siguiente.
+7. **Tarifación de tiempos técnicos adicionales:** Falta determinar si el montaje previo, desmontaje posterior y ensayo técnico tienen una tarifa diferenciada de soporte técnico o si se consideran cortesía según el tipo de paquete contratado.
+8. **Límites de días de montaje/desmontaje:** Falta confirmar si el montaje puede programarse en días calendario previos a la fecha del evento principal o si debe restringirse estrictamente a la misma jornada.
+
 

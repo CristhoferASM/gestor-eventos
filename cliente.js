@@ -64,7 +64,8 @@
       hasEnsayo: false,
       ensayoDate: '',
       ensayoStart: '',
-      ensayoEnd: ''
+      ensayoEnd: '',
+      adicionales: []
     },
     {
       id: 'EVT-002',
@@ -93,8 +94,18 @@
       hasEnsayo: false,
       ensayoDate: '',
       ensayoStart: '',
-      ensayoEnd: ''
+      ensayoEnd: '',
+      adicionales: []
     }
+  ];
+
+  // Catálogo compartido de adicionales con tarifas simuladas y configurables del prototipo
+  const CATALOGO_ADICIONALES = [
+    { id: 'cochera', nombre: 'Cochera', tarifaHora: 10, unidadLabel: 'Cantidad de unidades' },
+    { id: 'pantalla_led_5x4', nombre: 'Pantalla LED 5×4', tarifaHora: 200, unidadLabel: 'Cantidad de unidades' },
+    { id: 'pantalla_led_4x3', nombre: 'Pantalla LED 4×3', tarifaHora: 150, unidadLabel: 'Cantidad de unidades' },
+    { id: 'microfono', nombre: 'Micrófono', tarifaHora: 5, unidadLabel: 'Cantidad de unidades' },
+    { id: 'teleprompter', nombre: 'Teleprompter', tarifaHora: 10, unidadLabel: 'Cantidad de unidades' }
   ];
 
   const INSTITUTIONAL_BLOCKS = [
@@ -120,6 +131,7 @@
   let originalSnapshot = null;
   let ultimaSolicitudConfirmada = null;
   let isSubmitting = false;
+  let formAdicionalesCliente = [];
 
   const fpInstances = {};
   const fpDateInstances = {};
@@ -194,6 +206,23 @@
     errorPaso2Cliente: $('errorPaso2Cliente'),
     btnAvanzarPaso3Cliente: $('btnAvanzarPaso3Cliente'),
     btnDescartarPaso2Cliente: $('btnDescartarPaso2Cliente'),
+
+    // Adicionales Paso 2 y 3
+    seccionAdicionalesCliente: $('seccionAdicionalesCliente'),
+    selAdicionalCliente: $('selAdicionalCliente'),
+    numAdicionalCantidadCliente: $('numAdicionalCantidadCliente'),
+    lblAdicionalCantidadCliente: $('lblAdicionalCantidadCliente'),
+    numAdicionalHorasCliente: $('numAdicionalHorasCliente'),
+    txtAdicionalTarifaCliente: $('txtAdicionalTarifaCliente'),
+    txtAdicionalSubtotalCliente: $('txtAdicionalSubtotalCliente'),
+    btnAgregarAdicionalCliente: $('btnAgregarAdicionalCliente'),
+    btnAgregarAdicionalTextoCliente: $('btnAgregarAdicionalTextoCliente'),
+    errAdicionalFormCliente: $('errAdicionalFormCliente'),
+    tablaAdicionalesCliente: $('tablaAdicionalesCliente'),
+    tbodyAdicionalesCliente: $('tbodyAdicionalesCliente'),
+    totalAdicionalesTablaCliente: $('totalAdicionalesTablaCliente'),
+    msgAdicionalesVacioCliente: $('msgAdicionalesVacioCliente'),
+    adicionalesSummaryContainerCliente: $('adicionalesSummaryContainerCliente'),
 
     // Badges modificado
     modBadgeEventName: $('modBadgeEventName'),
@@ -336,6 +365,371 @@
   }
 
   // =========================================================================
+  // 4b. Utilidades y Helpers para Adicionales (Cliente)
+  // =========================================================================
+  function formatSoles(monto) {
+    const n = Number(monto) || 0;
+    return `S/ ${n.toFixed(2)}`;
+  }
+
+  function obtenerAdicionalCatalogo(id) {
+    return CATALOGO_ADICIONALES.find(a => a.id === id) || null;
+  }
+
+  function calcularSubtotalAdicional(cant, horas, tarifaHora) {
+    const c = parseInt(cant, 10) || 0;
+    const h = parseInt(horas, 10) || 0;
+    const t = Number(tarifaHora) || 0;
+    return Math.round(c * h * t * 100) / 100;
+  }
+
+  function calcularTotalAdicionales(lista) {
+    if (!Array.isArray(lista)) return 0;
+    const total = lista.reduce((sum, item) => sum + (Number(item.subtotal) || 0), 0);
+    return Math.round(total * 100) / 100;
+  }
+
+  function serializarAdicionalesParaComparar(lista) {
+    if (!Array.isArray(lista)) return [];
+    return lista.map(item => ({
+      id: item.id,
+      nombre: item.nombre,
+      cantidad: parseInt(item.cantidad, 10) || 0,
+      horas: parseInt(item.horas, 10) || 0,
+      tarifaHora: Number(item.tarifaHora) || 0,
+      subtotal: Math.round(((parseInt(item.cantidad, 10) || 0) * (parseInt(item.horas, 10) || 0) * (Number(item.tarifaHora) || 0)) * 100) / 100
+    })).sort((a, b) => a.id.localeCompare(b.id));
+  }
+
+  function sonAdicionalesIguales(listaA, listaB) {
+    const a = serializarAdicionalesParaComparar(listaA);
+    const b = serializarAdicionalesParaComparar(listaB);
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].id !== b[i].id ||
+          a[i].cantidad !== b[i].cantidad ||
+          a[i].horas !== b[i].horas ||
+          a[i].tarifaHora !== b[i].tarifaHora ||
+          a[i].subtotal !== b[i].subtotal) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function formatearResumenTextoAdicionales(lista) {
+    if (!Array.isArray(lista) || lista.length === 0) {
+      return 'Sin adicionales';
+    }
+    const items = lista.map(item => {
+      return `${item.nombre}: ${item.cantidad} un. × ${item.horas} h (${formatSoles(item.subtotal)})`;
+    });
+    const total = calcularTotalAdicionales(lista);
+    return `${items.join(' | ')} [Total: ${formatSoles(total)}]`;
+  }
+
+  function actualizarFormAdicionalCamposCliente() {
+    if (!dom.selAdicionalCliente) return;
+    const cat = obtenerAdicionalCatalogo(dom.selAdicionalCliente.value);
+    if (!cat) return;
+
+    if (dom.lblAdicionalCantidadCliente) {
+      dom.lblAdicionalCantidadCliente.textContent = cat.unidadLabel || 'Cantidad de unidades';
+    }
+
+    const existente = formAdicionalesCliente.find(a => a.id === cat.id);
+    if (existente) {
+      dom.numAdicionalCantidadCliente.value = existente.cantidad;
+      dom.numAdicionalHorasCliente.value = existente.horas;
+      if (dom.btnAgregarAdicionalTextoCliente) {
+        dom.btnAgregarAdicionalTextoCliente.textContent = 'Actualizar adicional';
+      }
+    } else {
+      if (!dom.numAdicionalCantidadCliente.value || parseInt(dom.numAdicionalCantidadCliente.value, 10) < 1) {
+        dom.numAdicionalCantidadCliente.value = 1;
+      }
+      if (!dom.numAdicionalHorasCliente.value || parseInt(dom.numAdicionalHorasCliente.value, 10) < 1) {
+        dom.numAdicionalHorasCliente.value = 1;
+      }
+      if (dom.btnAgregarAdicionalTextoCliente) {
+        dom.btnAgregarAdicionalTextoCliente.textContent = 'Agregar adicional';
+      }
+    }
+
+    dom.txtAdicionalTarifaCliente.value = `${formatSoles(cat.tarifaHora)} / h`;
+    recalcularSubtotalFormAdicionalCliente();
+  }
+
+  function recalcularSubtotalFormAdicionalCliente() {
+    if (!dom.selAdicionalCliente) return;
+    const cat = obtenerAdicionalCatalogo(dom.selAdicionalCliente.value);
+    if (!cat) return;
+
+    const cant = parseInt(dom.numAdicionalCantidadCliente.value, 10);
+    const horas = parseInt(dom.numAdicionalHorasCliente.value, 10);
+
+    if (isNaN(cant) || cant < 1 || isNaN(horas) || horas < 1) {
+      dom.txtAdicionalSubtotalCliente.value = 'S/ 0.00';
+      return;
+    }
+
+    const sub = calcularSubtotalAdicional(cant, horas, cat.tarifaHora);
+    dom.txtAdicionalSubtotalCliente.value = formatSoles(sub);
+  }
+
+  function agregarOActualizarAdicionalCliente() {
+    if (dom.errAdicionalFormCliente) dom.errAdicionalFormCliente.textContent = '';
+    const cat = obtenerAdicionalCatalogo(dom.selAdicionalCliente.value);
+    if (!cat) return;
+
+    const cantRaw = dom.numAdicionalCantidadCliente.value.trim();
+    const horasRaw = dom.numAdicionalHorasCliente.value.trim();
+
+    const cant = Number(cantRaw);
+    const horas = Number(horasRaw);
+
+    if (!Number.isInteger(cant) || cant < 1) {
+      if (dom.errAdicionalFormCliente) dom.errAdicionalFormCliente.textContent = 'La cantidad de unidades debe ser un número entero mayor a 0.';
+      dom.numAdicionalCantidadCliente.focus();
+      return;
+    }
+
+    if (!Number.isInteger(horas) || horas < 1) {
+      if (dom.errAdicionalFormCliente) dom.errAdicionalFormCliente.textContent = 'Las horas de uso deben ser un número entero mayor a 0.';
+      dom.numAdicionalHorasCliente.focus();
+      return;
+    }
+
+    const subtotal = calcularSubtotalAdicional(cant, horas, cat.tarifaHora);
+
+    const idx = formAdicionalesCliente.findIndex(a => a.id === cat.id);
+    if (idx >= 0) {
+      formAdicionalesCliente[idx] = {
+        id: cat.id,
+        nombre: cat.nombre,
+        cantidad: cant,
+        horas: horas,
+        tarifaHora: cat.tarifaHora,
+        subtotal: subtotal
+      };
+      showToast(`Adicional "${cat.nombre}" actualizado en su propuesta.`, 'ok');
+    } else {
+      formAdicionalesCliente.push({
+        id: cat.id,
+        nombre: cat.nombre,
+        cantidad: cant,
+        horas: horas,
+        tarifaHora: cat.tarifaHora,
+        subtotal: subtotal
+      });
+      showToast(`Adicional "${cat.nombre}" añadido a su propuesta.`, 'ok');
+    }
+
+    renderTablaAdicionalesCliente();
+    actualizarFormAdicionalCamposCliente();
+    actualizarEstadoDiferencias();
+  }
+
+  function editarAdicionalCliente(id) {
+    if (!dom.selAdicionalCliente) return;
+    dom.selAdicionalCliente.value = id;
+    actualizarFormAdicionalCamposCliente();
+    dom.numAdicionalCantidadCliente.focus();
+    dom.numAdicionalCantidadCliente.select();
+  }
+
+  function eliminarAdicionalCliente(id) {
+    const idx = formAdicionalesCliente.findIndex(a => a.id === id);
+    if (idx >= 0) {
+      const nombre = formAdicionalesCliente[idx].nombre;
+      formAdicionalesCliente.splice(idx, 1);
+      renderTablaAdicionalesCliente();
+      actualizarFormAdicionalCamposCliente();
+      actualizarEstadoDiferencias();
+      showToast(`Adicional "${nombre}" retirado de su propuesta.`, 'info');
+    }
+  }
+
+  function renderTablaAdicionalesCliente() {
+    if (!dom.tbodyAdicionalesCliente) return;
+
+    if (formAdicionalesCliente.length === 0) {
+      dom.tbodyAdicionalesCliente.innerHTML = '';
+      if (dom.msgAdicionalesVacioCliente) dom.msgAdicionalesVacioCliente.classList.remove('oculto');
+      if (dom.totalAdicionalesTablaCliente) dom.totalAdicionalesTablaCliente.textContent = formatSoles(0);
+      return;
+    }
+
+    if (dom.msgAdicionalesVacioCliente) dom.msgAdicionalesVacioCliente.classList.add('oculto');
+    dom.tbodyAdicionalesCliente.innerHTML = formAdicionalesCliente.map(item => {
+      return `
+        <tr data-adic-id="${escapeHtml(item.id)}">
+          <td><strong>${escapeHtml(item.nombre)}</strong></td>
+          <td style="text-align: center;">${item.cantidad}</td>
+          <td style="text-align: center;">${item.horas} h</td>
+          <td style="text-align: right;">${formatSoles(item.tarifaHora)} / h</td>
+          <td style="text-align: right; font-weight: 700; color: var(--primario);">${formatSoles(item.subtotal)}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-accion-adic btn-edit-adic" onclick="window.editarAdicionalCliente('${item.id}')" title="Editar cantidad y horas">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              Editar
+            </button>
+            <button type="button" class="btn-accion-adic btn-delete-adic" onclick="window.eliminarAdicionalCliente('${item.id}')" title="Quitar de la propuesta">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Quitar
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    const total = calcularTotalAdicionales(formAdicionalesCliente);
+    if (dom.totalAdicionalesTablaCliente) dom.totalAdicionalesTablaCliente.textContent = formatSoles(total);
+  }
+
+  function renderCardComparativoAdicionales(origAdic, actAdic, esCliente = false) {
+    const orig = Array.isArray(origAdic) ? origAdic : [];
+    const act = Array.isArray(actAdic) ? actAdic : [];
+
+    const totalOrig = calcularTotalAdicionales(orig);
+    const totalAct = calcularTotalAdicionales(act);
+    const diff = Math.round((totalAct - totalOrig) * 100) / 100;
+
+    const allIds = Array.from(new Set([...orig.map(o => o.id), ...act.map(a => a.id)]));
+
+    let rowsHtml = '';
+    if (allIds.length === 0) {
+      rowsHtml = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--gris); padding: 14px;">
+            No se registran adicionales contratados ni propuestos.
+          </td>
+        </tr>
+      `;
+    } else {
+      rowsHtml = allIds.map(id => {
+        const itemOrig = orig.find(o => o.id === id);
+        const itemAct = act.find(a => a.id === id);
+        const cat = obtenerAdicionalCatalogo(id);
+        const nombre = (itemAct && itemAct.nombre) || (itemOrig && itemOrig.nombre) || (cat && cat.nombre) || id;
+        const tarifaHora = (itemAct && itemAct.tarifaHora) || (itemOrig && itemOrig.tarifaHora) || (cat && cat.tarifaHora) || 0;
+
+        const subOrig = itemOrig ? Number(itemOrig.subtotal) : 0;
+        const subAct = itemAct ? Number(itemAct.subtotal) : 0;
+        const itemDiff = Math.round((subAct - subOrig) * 100) / 100;
+
+        const strOrig = itemOrig ? `${itemOrig.cantidad} un. × ${itemOrig.horas} h (${formatSoles(subOrig)})` : 'No contratado';
+        const strAct = itemAct ? `${itemAct.cantidad} un. × ${itemAct.horas} h (${formatSoles(subAct)})` : '<span style="color:var(--gris);">(Retirado)</span>';
+
+        let varBadge = '';
+        if (itemDiff > 0) {
+          varBadge = `<span class="badge-adic-variacion badge-adic-inc">+${formatSoles(itemDiff)}</span>`;
+        } else if (itemDiff < 0) {
+          varBadge = `<span class="badge-adic-variacion badge-adic-red">-${formatSoles(Math.abs(itemDiff))}</span>`;
+        } else {
+          varBadge = `<span class="badge-adic-variacion badge-adic-igual">Sin cambio</span>`;
+        }
+
+        const filaMod = itemDiff !== 0 || (!itemOrig && itemAct) || (itemOrig && !itemAct);
+
+        return `
+          <tr class="${filaMod ? 'fila-adicional-modificada' : ''}">
+            <td><strong>${escapeHtml(nombre)}</strong></td>
+            <td>${strOrig}</td>
+            <td class="${filaMod ? 'celda-propuesta' : ''}">${strAct}</td>
+            <td style="text-align: right;">${formatSoles(tarifaHora)} / h</td>
+            <td style="text-align: right; font-weight: 600;">${formatSoles(subAct)}</td>
+            <td style="text-align: center;">${varBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    let diffClase = 'importe-no-aplica';
+    let diffSigno = '';
+    let diffTextoExplicativo = 'Sin variación en costo de adicionales';
+
+    if (diff > 0) {
+      diffClase = 'diff-mas';
+      diffSigno = '+';
+      diffTextoExplicativo = 'Incremento propuesto en adicionales';
+    } else if (diff < 0) {
+      diffClase = 'diff-menos';
+      diffSigno = '-';
+      diffTextoExplicativo = 'Reducción propuesta (sin devolución automática)';
+    }
+
+    return `
+      <div class="resumen-adicionales-box">
+        <div class="resumen-adicionales-cab">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span class="resumen-adicionales-titulo">Resumen y Comparativo de Adicionales</span>
+          </div>
+          <span class="badge-tecnico ${esCliente ? 'badge-ensayo' : 'badge-evento'}">
+            ${esCliente ? 'Propuesta sujeta a revisión comercial' : 'Adicionales Showtech'}
+          </span>
+        </div>
+
+        <table class="tabla-comparativo-adicionales">
+          <thead>
+            <tr>
+              <th>Adicional</th>
+              <th>Datos actuales</th>
+              <th>Cambios propuestos</th>
+              <th style="text-align: right;">Tarifa</th>
+              <th style="text-align: right;">Subtotal propuesto</th>
+              <th style="text-align: center;">Variación</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="resumen-comercial-grid">
+          <div class="item-duracion item-comercial">
+            <small>Total actual de adicionales:</small>
+            <strong class="comercial-valor">${formatSoles(totalOrig)}</strong>
+            <span class="comercial-sub">${orig.length} servicio(s) registrado(s)</span>
+          </div>
+          <div class="item-duracion item-comercial">
+            <small>Total propuesto de adicionales:</small>
+            <strong class="comercial-valor">${formatSoles(totalAct)}</strong>
+            <span class="comercial-sub">${act.length} servicio(s) propuesto(s)</span>
+          </div>
+          <div class="item-duracion item-comercial">
+            <small>Diferencia de adicionales:</small>
+            <strong class="comercial-valor ${diffClase}">${diffSigno}${formatSoles(Math.abs(diff))}</strong>
+            <span class="comercial-sub">${diffTextoExplicativo}</span>
+          </div>
+        </div>
+
+        ${diff < 0 ? `
+          <div class="aviso aviso-info" style="margin-top: 12px; margin-bottom: 0; font-size: 12.5px;">
+            <strong>Reducción de adicionales propuesta:</strong> La propuesta contempla una reducción neta de ${formatSoles(Math.abs(diff))} en servicios adicionales respecto a su reserva actual. Esta disminución no genera devolución automática y estará sujeta a la liquidación final del asesor comercial.
+          </div>
+        ` : ''}
+
+        <p class="nota-adicionales-pie">
+          * Importes referenciales para el prototipo. El costo de adicionales es independiente de las horas del auditorio y del cargo por modificación.
+          ${esCliente ? ' Importe final pendiente de revisión por el asesor comercial.' : ''}
+        </p>
+      </div>
+    `;
+  }
+
+  // =========================================================================
   // 5. Persistencia y Carga de Datos
   // =========================================================================
   function loadStorage() {
@@ -344,13 +738,23 @@
       const rawEvents = localStorage.getItem(STORAGE_KEYS.EVENTS);
       if (rawEvents) {
         eventsData = JSON.parse(rawEvents);
+        eventsData = eventsData.map(ev => ({
+          ...ev,
+          adicionales: Array.isArray(ev.adicionales) ? ev.adicionales : []
+        }));
       } else {
-        eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS));
+        eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS)).map(ev => ({
+          ...ev,
+          adicionales: Array.isArray(ev.adicionales) ? ev.adicionales : []
+        }));
         saveEventsStorage();
       }
     } catch (e) {
       console.warn('Error leyendo eventos de localStorage:', e);
-      eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS));
+      eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS)).map(ev => ({
+        ...ev,
+        adicionales: Array.isArray(ev.adicionales) ? ev.adicionales : []
+      }));
     }
 
     // 2. Cargar solicitudes compartidas del cliente
@@ -1080,6 +1484,10 @@
     if (!ev) return;
 
     originalSnapshot = JSON.parse(JSON.stringify(ev));
+    originalSnapshot.adicionales = (ev.adicionales && Array.isArray(ev.adicionales))
+      ? JSON.parse(JSON.stringify(ev.adicionales))
+      : [];
+    formAdicionalesCliente = JSON.parse(JSON.stringify(originalSnapshot.adicionales));
 
     // Datos de solo lectura
     dom.eventCode.value = ev.code || ev.id;
@@ -1137,6 +1545,8 @@
     if (dom.errRequestReason) dom.errRequestReason.textContent = '';
     if (dom.errorPaso2Cliente) dom.errorPaso2Cliente.textContent = '';
 
+    renderTablaAdicionalesCliente();
+    actualizarFormAdicionalCamposCliente();
     actualizarResumenHorario();
     actualizarEstadoDiferencias();
   }
@@ -1169,7 +1579,9 @@
       hasEnsayo: dom.chkEnsayo.checked,
       ensayoDate: dom.chkEnsayo.checked ? normalizarFecha(dom.ensayoDate.value) : '',
       ensayoStart: dom.chkEnsayo.checked ? normalizarHora(dom.ensayoStartTime.value) : '',
-      ensayoEnd: dom.chkEnsayo.checked ? normalizarHora(dom.ensayoEndTime.value) : ''
+      ensayoEnd: dom.chkEnsayo.checked ? normalizarHora(dom.ensayoEndTime.value) : '',
+
+      adicionales: JSON.parse(JSON.stringify(formAdicionalesCliente))
     };
   }
 
@@ -1257,6 +1669,17 @@
       : 'No requiere';
     if (origEnsStr !== actEnsStr) {
       diffs.push({ campo: 'Ensayo técnico previo', anterior: origEnsStr, nuevo: actEnsStr });
+    }
+
+    // Adicionales
+    const origAdic = originalSnapshot.adicionales || [];
+    const actAdic = actual.adicionales || [];
+    if (!sonAdicionalesIguales(origAdic, actAdic)) {
+      diffs.push({
+        campo: 'Adicionales del evento',
+        anterior: formatearResumenTextoAdicionales(origAdic),
+        nuevo: formatearResumenTextoAdicionales(actAdic)
+      });
     }
 
     return diffs;
@@ -1468,7 +1891,13 @@
       { campo: 'Horario del evento', actual: `${origStartNorm} - ${origEndNorm}`, propuesto: `${actStartNorm} - ${actEndNorm}`, modificado: (origStartNorm !== actStartNorm || origEndNorm !== actEndNorm) },
       { campo: 'Montaje técnico previo', actual: origMont, propuesto: actMont, modificado: origMont !== actMont },
       { campo: 'Desmontaje técnico posterior', actual: origDesm, propuesto: actDesm, modificado: origDesm !== actDesm },
-      { campo: 'Ensayo técnico previo', actual: origEns, propuesto: actEns, modificado: origEns !== actEns }
+      { campo: 'Ensayo técnico previo', actual: origEns, propuesto: actEns, modificado: origEns !== actEns },
+      {
+        campo: 'Adicionales del evento',
+        actual: formatearResumenTextoAdicionales(orig.adicionales),
+        propuesto: formatearResumenTextoAdicionales(act.adicionales),
+        modificado: !sonAdicionalesIguales(orig.adicionales, act.adicionales)
+      }
     ];
   }
 
@@ -1503,6 +1932,15 @@
         </tbody>
       </table>
     `;
+
+    const f = getValoresFormulario();
+    if (dom.adicionalesSummaryContainerCliente) {
+      dom.adicionalesSummaryContainerCliente.innerHTML = renderCardComparativoAdicionales(
+        originalSnapshot.adicionales || [],
+        f.adicionales || [],
+        true
+      );
+    }
 
     // Motivo registrado
     const motivo = dom.requestReason ? dom.requestReason.value.trim() : '';
@@ -1740,6 +2178,13 @@
         </table>
       </div>
     `;
+
+    // Comparativo de adicionales en el detalle de la solicitud si aplica
+    const origAdicSol = Array.isArray(s.originalSnapshot?.adicionales) ? s.originalSnapshot.adicionales : [];
+    const propAdicSol = Array.isArray(s.proposedData?.adicionales) ? s.proposedData.adicionales : [];
+    if (origAdicSol.length > 0 || propAdicSol.length > 0) {
+      body.innerHTML += renderCardComparativoAdicionales(origAdicSol, propAdicSol, true);
+    }
 
     // Botón de retiro: SOLO cuando la solicitud pertenece al cliente actual Y está "Pendiente de revisión"
     const esRetirable = (s.clientId === CLIENTE_ACTUAL.id || s.clientName === CLIENTE_ACTUAL.razonSocial) && (s.status === 'Pendiente de revisión');
@@ -1994,6 +2439,22 @@
       dom.errorPaso2Cliente.textContent = '';
       irPasoCliente(3);
     });
+
+    // Listeners de adicionales (Cliente)
+    if (dom.selAdicionalCliente) {
+      dom.selAdicionalCliente.addEventListener('change', actualizarFormAdicionalCamposCliente);
+    }
+    if (dom.numAdicionalCantidadCliente) {
+      dom.numAdicionalCantidadCliente.addEventListener('input', recalcularSubtotalFormAdicionalCliente);
+    }
+    if (dom.numAdicionalHorasCliente) {
+      dom.numAdicionalHorasCliente.addEventListener('input', recalcularSubtotalFormAdicionalCliente);
+    }
+    if (dom.btnAgregarAdicionalCliente) {
+      dom.btnAgregarAdicionalCliente.addEventListener('click', agregarOActualizarAdicionalCliente);
+    }
+    window.editarAdicionalCliente = editarAdicionalCliente;
+    window.eliminarAdicionalCliente = eliminarAdicionalCliente;
 
     dom.btnDescartarPaso2Cliente.addEventListener('click', () => {
       if (hayCambiosPendientes()) {

@@ -50,7 +50,8 @@
       hasEnsayo: false,
       ensayoDate: '',
       ensayoStart: '',
-      ensayoEnd: ''
+      ensayoEnd: '',
+      adicionales: []
     },
     {
       id: 'EVT-002',
@@ -78,8 +79,18 @@
       hasEnsayo: false,
       ensayoDate: '',
       ensayoStart: '',
-      ensayoEnd: ''
+      ensayoEnd: '',
+      adicionales: []
     }
+  ];
+
+  // Catálogo compartido de adicionales con tarifas simuladas y configurables del prototipo
+  const CATALOGO_ADICIONALES = [
+    { id: 'cochera', nombre: 'Cochera', tarifaHora: 10, unidadLabel: 'Cantidad de unidades' },
+    { id: 'pantalla_led_5x4', nombre: 'Pantalla LED 5×4', tarifaHora: 200, unidadLabel: 'Cantidad de unidades' },
+    { id: 'pantalla_led_4x3', nombre: 'Pantalla LED 4×3', tarifaHora: 150, unidadLabel: 'Cantidad de unidades' },
+    { id: 'microfono', nombre: 'Micrófono', tarifaHora: 5, unidadLabel: 'Cantidad de unidades' },
+    { id: 'teleprompter', nombre: 'Teleprompter', tarifaHora: 10, unidadLabel: 'Cantidad de unidades' }
   ];
 
   // Bloqueos institucionales programados
@@ -107,6 +118,7 @@
   let pasoActual = 1;
   let pendingSwitchEventId = null;
   let lastConflictAlternatives = [];
+  let formAdicionales = [];
 
   // =========================================================================
   // 3. Referencias al DOM
@@ -168,6 +180,23 @@
     btnAvanzarPaso2: $('btnAvanzarPaso2'),
     btnDirectoRevision: $('btnDirectoRevision'),
     btnDescartarPaso2: $('btnDescartarPaso2'),
+
+    // Adicionales del Evento (Paso 2)
+    seccionAdicionalesAsesor: $('seccionAdicionalesAsesor'),
+    selAdicional: $('selAdicional'),
+    numAdicionalCantidad: $('numAdicionalCantidad'),
+    lblAdicionalCantidad: $('lblAdicionalCantidad'),
+    numAdicionalHoras: $('numAdicionalHoras'),
+    txtAdicionalTarifa: $('txtAdicionalTarifa'),
+    txtAdicionalSubtotal: $('txtAdicionalSubtotal'),
+    btnAgregarAdicional: $('btnAgregarAdicional'),
+    btnAgregarAdicionalTexto: $('btnAgregarAdicionalTexto'),
+    errAdicionalForm: $('errAdicionalForm'),
+    tablaAdicionales: $('tablaAdicionales'),
+    tbodyAdicionales: $('tbodyAdicionales'),
+    totalAdicionalesTabla: $('totalAdicionalesTabla'),
+    msgAdicionalesVacio: $('msgAdicionalesVacio'),
+    adicionalesSummaryContainer: $('adicionalesSummaryContainer'),
 
     // Insignias Modificado
     modBadgeEventName: $('modBadgeEventName'),
@@ -317,6 +346,368 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  // =========================================================================
+  // 4b. Utilidades y Helpers para Adicionales
+  // =========================================================================
+  function formatSoles(monto) {
+    const n = Number(monto) || 0;
+    return `S/ ${n.toFixed(2)}`;
+  }
+
+  function obtenerAdicionalCatalogo(id) {
+    return CATALOGO_ADICIONALES.find(a => a.id === id) || null;
+  }
+
+  function calcularSubtotalAdicional(cant, horas, tarifaHora) {
+    const c = parseInt(cant, 10) || 0;
+    const h = parseInt(horas, 10) || 0;
+    const t = Number(tarifaHora) || 0;
+    return Math.round(c * h * t * 100) / 100;
+  }
+
+  function calcularTotalAdicionales(lista) {
+    if (!Array.isArray(lista)) return 0;
+    const total = lista.reduce((sum, item) => sum + (Number(item.subtotal) || 0), 0);
+    return Math.round(total * 100) / 100;
+  }
+
+  function serializarAdicionalesParaComparar(lista) {
+    if (!Array.isArray(lista)) return [];
+    return lista.map(item => ({
+      id: item.id,
+      nombre: item.nombre,
+      cantidad: parseInt(item.cantidad, 10) || 0,
+      horas: parseInt(item.horas, 10) || 0,
+      tarifaHora: Number(item.tarifaHora) || 0,
+      subtotal: Math.round(((parseInt(item.cantidad, 10) || 0) * (parseInt(item.horas, 10) || 0) * (Number(item.tarifaHora) || 0)) * 100) / 100
+    })).sort((a, b) => a.id.localeCompare(b.id));
+  }
+
+  function sonAdicionalesIguales(listaA, listaB) {
+    const a = serializarAdicionalesParaComparar(listaA);
+    const b = serializarAdicionalesParaComparar(listaB);
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].id !== b[i].id ||
+          a[i].cantidad !== b[i].cantidad ||
+          a[i].horas !== b[i].horas ||
+          a[i].tarifaHora !== b[i].tarifaHora ||
+          a[i].subtotal !== b[i].subtotal) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function formatearResumenTextoAdicionales(lista) {
+    if (!Array.isArray(lista) || lista.length === 0) {
+      return 'Sin adicionales';
+    }
+    const items = lista.map(item => {
+      return `${item.nombre}: ${item.cantidad} un. × ${item.horas} h (${formatSoles(item.subtotal)})`;
+    });
+    const total = calcularTotalAdicionales(lista);
+    return `${items.join(' | ')} [Total: ${formatSoles(total)}]`;
+  }
+
+  function actualizarFormAdicionalCampos() {
+    if (!dom.selAdicional) return;
+    const cat = obtenerAdicionalCatalogo(dom.selAdicional.value);
+    if (!cat) return;
+
+    if (dom.lblAdicionalCantidad) {
+      dom.lblAdicionalCantidad.textContent = cat.unidadLabel || 'Cantidad de unidades';
+    }
+
+    // Comprobar si ya existe en formAdicionales
+    const existente = formAdicionales.find(a => a.id === cat.id);
+    if (existente) {
+      dom.numAdicionalCantidad.value = existente.cantidad;
+      dom.numAdicionalHoras.value = existente.horas;
+      dom.btnAgregarAdicionalTexto.textContent = 'Actualizar adicional';
+    } else {
+      if (!dom.numAdicionalCantidad.value || parseInt(dom.numAdicionalCantidad.value, 10) < 1) {
+        dom.numAdicionalCantidad.value = 1;
+      }
+      if (!dom.numAdicionalHoras.value || parseInt(dom.numAdicionalHoras.value, 10) < 1) {
+        dom.numAdicionalHoras.value = 1;
+      }
+      dom.btnAgregarAdicionalTexto.textContent = 'Agregar adicional';
+    }
+
+    dom.txtAdicionalTarifa.value = `${formatSoles(cat.tarifaHora)} / h`;
+    recalcularSubtotalFormAdicional();
+  }
+
+  function recalcularSubtotalFormAdicional() {
+    if (!dom.selAdicional) return;
+    const cat = obtenerAdicionalCatalogo(dom.selAdicional.value);
+    if (!cat) return;
+
+    const cant = parseInt(dom.numAdicionalCantidad.value, 10);
+    const horas = parseInt(dom.numAdicionalHoras.value, 10);
+
+    if (isNaN(cant) || cant < 1 || isNaN(horas) || horas < 1) {
+      dom.txtAdicionalSubtotal.value = 'S/ 0.00';
+      return;
+    }
+
+    const sub = calcularSubtotalAdicional(cant, horas, cat.tarifaHora);
+    dom.txtAdicionalSubtotal.value = formatSoles(sub);
+  }
+
+  function agregarOActualizarAdicional() {
+    if (dom.errAdicionalForm) dom.errAdicionalForm.textContent = '';
+    const cat = obtenerAdicionalCatalogo(dom.selAdicional.value);
+    if (!cat) return;
+
+    const cantRaw = dom.numAdicionalCantidad.value.trim();
+    const horasRaw = dom.numAdicionalHoras.value.trim();
+
+    const cant = Number(cantRaw);
+    const horas = Number(horasRaw);
+
+    if (!Number.isInteger(cant) || cant < 1) {
+      if (dom.errAdicionalForm) dom.errAdicionalForm.textContent = 'La cantidad de unidades debe ser un número entero mayor a 0.';
+      dom.numAdicionalCantidad.focus();
+      return;
+    }
+
+    if (!Number.isInteger(horas) || horas < 1) {
+      if (dom.errAdicionalForm) dom.errAdicionalForm.textContent = 'Las horas de uso deben ser un número entero mayor a 0.';
+      dom.numAdicionalHoras.focus();
+      return;
+    }
+
+    const subtotal = calcularSubtotalAdicional(cant, horas, cat.tarifaHora);
+
+    const idx = formAdicionales.findIndex(a => a.id === cat.id);
+    if (idx >= 0) {
+      formAdicionales[idx] = {
+        id: cat.id,
+        nombre: cat.nombre,
+        cantidad: cant,
+        horas: horas,
+        tarifaHora: cat.tarifaHora,
+        subtotal: subtotal
+      };
+      showToast(`Adicional "${cat.nombre}" actualizado correctamente.`, 'ok');
+    } else {
+      formAdicionales.push({
+        id: cat.id,
+        nombre: cat.nombre,
+        cantidad: cant,
+        horas: horas,
+        tarifaHora: cat.tarifaHora,
+        subtotal: subtotal
+      });
+      showToast(`Adicional "${cat.nombre}" agregado.`, 'ok');
+    }
+
+    renderTablaAdicionalesForm();
+    actualizarFormAdicionalCampos();
+    actualizarEstadoDiferencias();
+  }
+
+  function editarAdicional(id) {
+    if (!dom.selAdicional) return;
+    dom.selAdicional.value = id;
+    actualizarFormAdicionalCampos();
+    dom.numAdicionalCantidad.focus();
+    dom.numAdicionalCantidad.select();
+  }
+
+  function eliminarAdicional(id) {
+    const idx = formAdicionales.findIndex(a => a.id === id);
+    if (idx >= 0) {
+      const nombre = formAdicionales[idx].nombre;
+      formAdicionales.splice(idx, 1);
+      renderTablaAdicionalesForm();
+      actualizarFormAdicionalCampos();
+      actualizarEstadoDiferencias();
+      showToast(`Adicional "${nombre}" retirado.`, 'info');
+    }
+  }
+
+  function renderTablaAdicionalesForm() {
+    if (!dom.tbodyAdicionales) return;
+
+    if (formAdicionales.length === 0) {
+      dom.tbodyAdicionales.innerHTML = '';
+      if (dom.msgAdicionalesVacio) dom.msgAdicionalesVacio.classList.remove('oculto');
+      if (dom.totalAdicionalesTabla) dom.totalAdicionalesTabla.textContent = formatSoles(0);
+      return;
+    }
+
+    if (dom.msgAdicionalesVacio) dom.msgAdicionalesVacio.classList.add('oculto');
+    dom.tbodyAdicionales.innerHTML = formAdicionales.map(item => {
+      return `
+        <tr data-adic-id="${escapeHtml(item.id)}">
+          <td><strong>${escapeHtml(item.nombre)}</strong></td>
+          <td style="text-align: center;">${item.cantidad}</td>
+          <td style="text-align: center;">${item.horas} h</td>
+          <td style="text-align: right;">${formatSoles(item.tarifaHora)} / h</td>
+          <td style="text-align: right; font-weight: 700; color: var(--primario);">${formatSoles(item.subtotal)}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-accion-adic btn-edit-adic" onclick="window.editarAdicionalAsesor('${item.id}')" title="Editar cantidad y horas">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              Editar
+            </button>
+            <button type="button" class="btn-accion-adic btn-delete-adic" onclick="window.eliminarAdicionalAsesor('${item.id}')" title="Quitar adicional">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Quitar
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    const total = calcularTotalAdicionales(formAdicionales);
+    if (dom.totalAdicionalesTabla) dom.totalAdicionalesTabla.textContent = formatSoles(total);
+  }
+
+  function renderCardComparativoAdicionales(origAdic, actAdic, esCliente = false) {
+    const orig = Array.isArray(origAdic) ? origAdic : [];
+    const act = Array.isArray(actAdic) ? actAdic : [];
+
+    const totalOrig = calcularTotalAdicionales(orig);
+    const totalAct = calcularTotalAdicionales(act);
+    const diff = Math.round((totalAct - totalOrig) * 100) / 100;
+
+    const allIds = Array.from(new Set([...orig.map(o => o.id), ...act.map(a => a.id)]));
+
+    let rowsHtml = '';
+    if (allIds.length === 0) {
+      rowsHtml = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--gris); padding: 14px;">
+            No se registran adicionales contratados ni propuestos.
+          </td>
+        </tr>
+      `;
+    } else {
+      rowsHtml = allIds.map(id => {
+        const itemOrig = orig.find(o => o.id === id);
+        const itemAct = act.find(a => a.id === id);
+        const cat = obtenerAdicionalCatalogo(id);
+        const nombre = (itemAct && itemAct.nombre) || (itemOrig && itemOrig.nombre) || (cat && cat.nombre) || id;
+        const tarifaHora = (itemAct && itemAct.tarifaHora) || (itemOrig && itemOrig.tarifaHora) || (cat && cat.tarifaHora) || 0;
+
+        const subOrig = itemOrig ? Number(itemOrig.subtotal) : 0;
+        const subAct = itemAct ? Number(itemAct.subtotal) : 0;
+        const itemDiff = Math.round((subAct - subOrig) * 100) / 100;
+
+        const strOrig = itemOrig ? `${itemOrig.cantidad} un. × ${itemOrig.horas} h (${formatSoles(subOrig)})` : 'No contratado';
+        const strAct = itemAct ? `${itemAct.cantidad} un. × ${itemAct.horas} h (${formatSoles(subAct)})` : '<span style="color:var(--gris);">(Retirado)</span>';
+
+        let varBadge = '';
+        if (itemDiff > 0) {
+          varBadge = `<span class="badge-adic-variacion badge-adic-inc">+${formatSoles(itemDiff)}</span>`;
+        } else if (itemDiff < 0) {
+          varBadge = `<span class="badge-adic-variacion badge-adic-red">-${formatSoles(Math.abs(itemDiff))}</span>`;
+        } else {
+          varBadge = `<span class="badge-adic-variacion badge-adic-igual">Sin cambio</span>`;
+        }
+
+        const filaMod = itemDiff !== 0 || (!itemOrig && itemAct) || (itemOrig && !itemAct);
+
+        return `
+          <tr class="${filaMod ? 'fila-adicional-modificada' : ''}">
+            <td><strong>${escapeHtml(nombre)}</strong></td>
+            <td>${strOrig}</td>
+            <td class="${filaMod ? 'celda-propuesta' : ''}">${strAct}</td>
+            <td style="text-align: right;">${formatSoles(tarifaHora)} / h</td>
+            <td style="text-align: right; font-weight: 600;">${formatSoles(subAct)}</td>
+            <td style="text-align: center;">${varBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    let diffClase = 'importe-no-aplica';
+    let diffSigno = '';
+    let diffTextoExplicativo = 'Sin variación en costo de adicionales';
+
+    if (diff > 0) {
+      diffClase = 'diff-mas';
+      diffSigno = '+';
+      diffTextoExplicativo = 'Incremento propuesto en adicionales';
+    } else if (diff < 0) {
+      diffClase = 'diff-menos';
+      diffSigno = '-';
+      diffTextoExplicativo = 'Reducción propuesta (sin devolución automática)';
+    }
+
+    return `
+      <div class="resumen-adicionales-box">
+        <div class="resumen-adicionales-cab">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span class="resumen-adicionales-titulo">Resumen y Comparativo de Adicionales</span>
+          </div>
+          <span class="badge-tecnico ${esCliente ? 'badge-ensayo' : 'badge-evento'}">
+            ${esCliente ? 'Propuesta sujeta a revisión comercial' : 'Adicionales Showtech'}
+          </span>
+        </div>
+
+        <table class="tabla-comparativo-adicionales">
+          <thead>
+            <tr>
+              <th>Adicional</th>
+              <th>Datos actuales</th>
+              <th>Cambios propuestos</th>
+              <th style="text-align: right;">Tarifa</th>
+              <th style="text-align: right;">Subtotal propuesto</th>
+              <th style="text-align: center;">Variación</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="resumen-comercial-grid">
+          <div class="item-duracion item-comercial">
+            <small>Total actual de adicionales:</small>
+            <strong class="comercial-valor">${formatSoles(totalOrig)}</strong>
+            <span class="comercial-sub">${orig.length} servicio(s) registrado(s)</span>
+          </div>
+          <div class="item-duracion item-comercial">
+            <small>Total propuesto de adicionales:</small>
+            <strong class="comercial-valor">${formatSoles(totalAct)}</strong>
+            <span class="comercial-sub">${act.length} servicio(s) propuesto(s)</span>
+          </div>
+          <div class="item-duracion item-comercial">
+            <small>Diferencia de adicionales:</small>
+            <strong class="comercial-valor ${diffClase}">${diffSigno}${formatSoles(Math.abs(diff))}</strong>
+            <span class="comercial-sub">${diffTextoExplicativo}</span>
+          </div>
+        </div>
+
+        ${diff < 0 ? `
+          <div class="aviso aviso-info" style="margin-top: 12px; margin-bottom: 0; font-size: 12.5px;">
+            <strong>Reducción de adicionales propuesta:</strong> La solicitud contempla una reducción neta de ${formatSoles(Math.abs(diff))} en servicios adicionales respecto al registro actual. Esta disminución se registra como propuesta y no genera devoluciones automáticas.
+          </div>
+        ` : ''}
+
+        <p class="nota-adicionales-pie">
+          * Importes referenciales para el prototipo. El costo de adicionales se calcula de forma independiente a las horas de sala del auditorio y a los cargos por modificación.
+          ${esCliente ? ' Importe final pendiente de revisión por el asesor.' : ''}
+        </p>
+      </div>
+    `;
   }
 
   function showToast(message, type = 'info') {
@@ -718,8 +1109,15 @@
       const storedEvents = localStorage.getItem(STORAGE_KEYS.EVENTS);
       if (storedEvents) {
         eventsData = JSON.parse(storedEvents);
+        eventsData = eventsData.map(ev => ({
+          ...ev,
+          adicionales: Array.isArray(ev.adicionales) ? ev.adicionales : []
+        }));
       } else {
-        eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS));
+        eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS)).map(ev => ({
+          ...ev,
+          adicionales: Array.isArray(ev.adicionales) ? ev.adicionales : []
+        }));
         saveEventsStorage();
       }
 
@@ -731,7 +1129,10 @@
       }
     } catch (e) {
       console.warn('Error accediendo a localStorage. Usando datos iniciales en memoria.', e);
-      eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS));
+      eventsData = JSON.parse(JSON.stringify(INITIAL_EVENTS)).map(ev => ({
+        ...ev,
+        adicionales: Array.isArray(ev.adicionales) ? ev.adicionales : []
+      }));
       historyData = {};
     }
   }
@@ -739,8 +1140,10 @@
   function saveEventsStorage() {
     try {
       localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(eventsData));
+      return true;
     } catch (e) {
       console.error('Error al guardar eventos en localStorage:', e);
+      return false;
     }
   }
 
@@ -956,6 +1359,10 @@
     if (!ev) return;
 
     originalSnapshot = JSON.parse(JSON.stringify(ev));
+    originalSnapshot.adicionales = (ev.adicionales && Array.isArray(ev.adicionales))
+      ? JSON.parse(JSON.stringify(ev.adicionales))
+      : [];
+    formAdicionales = JSON.parse(JSON.stringify(originalSnapshot.adicionales));
     isAvailabilityVerified = false;
 
     // Poblar campos de información general
@@ -1015,6 +1422,8 @@
     dom.errorPaso2.textContent = '';
     if (dom.modificationReason) dom.modificationReason.value = '';
 
+    renderTablaAdicionalesForm();
+    actualizarFormAdicionalCampos();
     actualizarResumenHorario();
     actualizarEstadoDiferencias();
     renderHistorial();
@@ -1052,7 +1461,9 @@
       hasEnsayo: dom.chkEnsayo.checked,
       ensayoDate: dom.chkEnsayo.checked ? normalizarFecha(dom.ensayoDate.value) : '',
       ensayoStart: dom.chkEnsayo.checked ? normalizarHora(dom.ensayoStartTime.value) : '',
-      ensayoEnd: dom.chkEnsayo.checked ? normalizarHora(dom.ensayoEndTime.value) : ''
+      ensayoEnd: dom.chkEnsayo.checked ? normalizarHora(dom.ensayoEndTime.value) : '',
+
+      adicionales: JSON.parse(JSON.stringify(formAdicionales))
     };
   }
 
@@ -1612,7 +2023,15 @@
       <div class="dato"><small>Ensayo técnico</small><strong>${ensayoHtml}</strong></div>
     `;
 
-    if (!isAvailabilityVerified) {
+    if (!hayCambiosDeHorario()) {
+      isAvailabilityVerified = true;
+      dom.availabilityFeedback.className = 'aviso aviso-ok';
+      dom.feedbackTitle.textContent = '✓ Disponibilidad confirmada (Sin cambios de horario)';
+      dom.feedbackMessage.textContent = 'El cronograma y tiempos técnicos del auditorio no presentan modificaciones. La disponibilidad original de la sala se mantiene confirmada.';
+      dom.feedbackDetails.classList.add('oculto');
+      dom.scheduleSuggestionsContainer.classList.add('oculto');
+      dom.btnContinuarPaso4.disabled = false;
+    } else if (!isAvailabilityVerified) {
       dom.availabilityFeedback.className = 'aviso aviso-info';
       dom.feedbackTitle.textContent = 'Pendiente de verificar';
       dom.feedbackMessage.textContent = 'Haga clic en el botón superior para comprobar posibles cruces con otros eventos y bloqueos institucionales.';
@@ -1793,6 +2212,17 @@
       diffs.push({ campo: 'Ensayo técnico previo', anterior: origEnsStr, nuevo: actEnsStr });
     }
 
+    // Adicionales del evento
+    const origAdic = originalSnapshot.adicionales || [];
+    const actAdic = actual.adicionales || [];
+    if (!sonAdicionalesIguales(origAdic, actAdic)) {
+      diffs.push({
+        campo: 'Adicionales del evento',
+        anterior: formatearResumenTextoAdicionales(origAdic),
+        nuevo: formatearResumenTextoAdicionales(actAdic)
+      });
+    }
+
     return diffs;
   }
 
@@ -1862,7 +2292,13 @@
       { campo: 'Horario del evento', actual: `${origStartNorm} - ${origEndNorm}`, propuesto: `${actStartNorm} - ${actEndNorm}`, modificado: (origStartNorm !== actStartNorm || origEndNorm !== actEndNorm) },
       { campo: 'Montaje técnico previo', actual: origMont, propuesto: actMont, modificado: origMont !== actMont },
       { campo: 'Desmontaje técnico posterior', actual: origDesm, propuesto: actDesm, modificado: origDesm !== actDesm },
-      { campo: 'Ensayo técnico previo', actual: origEns, propuesto: actEns, modificado: origEns !== actEns }
+      { campo: 'Ensayo técnico previo', actual: origEns, propuesto: actEns, modificado: origEns !== actEns },
+      {
+        campo: 'Adicionales del evento',
+        actual: formatearResumenTextoAdicionales(orig.adicionales),
+        propuesto: formatearResumenTextoAdicionales(act.adicionales),
+        modificado: !sonAdicionalesIguales(orig.adicionales, act.adicionales)
+      }
     ];
   }
 
@@ -1903,6 +2339,10 @@
       ${f.phone ? fila('Teléfono', f.phone) : ''}
       ${f.email ? fila('Correo electrónico', f.email) : ''}
       ${fila('Modificación solicitada por', f.requestedBy)}
+
+      <div class="comp-sec">Servicios Adicionales</div>
+      ${fila('Adicionales contratados', f.adicionales && f.adicionales.length > 0 ? formatearResumenTextoAdicionales(f.adicionales) : 'Sin adicionales contratados')}
+      ${fila('Tarifas de adicionales', 'Importes referenciales para el prototipo')}
 
       <div class="comp-sec">Control y Auditoría</div>
       ${fila('Estado del evento', ev.status || 'Confirmado')}
@@ -2037,6 +2477,14 @@
       `;
     }
 
+    if (dom.adicionalesSummaryContainer) {
+      dom.adicionalesSummaryContainer.innerHTML = renderCardComparativoAdicionales(
+        originalSnapshot.adicionales || [],
+        f.adicionales || [],
+        false
+      );
+    }
+
     // 2. Tabla Comparativa en Dos Columnas
     if (diffs.length === 0) {
       dom.diffTableContainer.innerHTML = `
@@ -2140,11 +2588,19 @@
       ensayoDate: f.ensayoDate,
       ensayoStart: f.ensayoStart,
       ensayoEnd: f.ensayoEnd,
+      adicionales: JSON.parse(JSON.stringify(f.adicionales || [])),
       lastModified: new Date().toISOString()
     };
 
+    const backupPrevio = JSON.parse(JSON.stringify(eventsData[idx]));
     eventsData[idx] = eventoActualizado;
-    saveEventsStorage();
+    const saveOk = saveEventsStorage();
+    if (!saveOk) {
+      eventsData[idx] = backupPrevio;
+      dom.errorPaso4.textContent = 'Error al guardar los cambios en el almacenamiento local. Los datos originales se conservaron.';
+      showToast('Error de almacenamiento local. No se guardaron los cambios.', 'error');
+      return;
+    }
 
     if (!historyData[currentEventId]) {
       historyData[currentEventId] = [];
@@ -2421,7 +2877,71 @@
     const labelW = doc.getTextWidth(labelLine);
     doc.text(importeAdicPdf, 20 + labelW, y + 18);
 
-    // 6. Pie de Página Formal para el Cliente
+    y += 24;
+
+    // 6. Adicionales del Evento (Tarifas referenciales del prototipo)
+    const adicsPdf = Array.isArray(ev.adicionales) ? ev.adicionales : [];
+    const totalAdicPdf = calcularTotalAdicionales(adicsPdf);
+
+    if (y + (adicsPdf.length * 5) + 20 > 265) {
+      doc.addPage();
+      y = 20;
+    }
+
+    doc.setTextColor(31, 78, 156);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.text('ADICIONALES DEL EVENTO', 15, y);
+
+    y += 4;
+    doc.setFillColor(241, 245, 249);
+    doc.rect(15, y, 180, 6, 'F');
+    doc.setTextColor(71, 85, 105);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Servicio / Recurso adicional', 18, y + 4.2);
+    doc.text('Cantidad', 85, y + 4.2);
+    doc.text('Horas', 115, y + 4.2);
+    doc.text('Tarifa / h', 145, y + 4.2);
+    doc.text('Subtotal', 175, y + 4.2);
+
+    y += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+
+    if (adicsPdf.length === 0) {
+      doc.setTextColor(100, 116, 139);
+      doc.text('Sin servicios adicionales registrados para este evento.', 18, y + 4.2);
+      y += 6;
+    } else {
+      adicsPdf.forEach(ad => {
+        doc.setDrawColor(226, 232, 240);
+        doc.line(15, y + 5, 195, y + 5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(String(ad.nombre || ad.id).slice(0, 32), 18, y + 3.8);
+        doc.text(String(ad.cantidad), 88, y + 3.8);
+        doc.text(`${ad.horas} h`, 117, y + 3.8);
+        doc.text(formatSoles(ad.tarifaHora), 145, y + 3.8);
+        doc.setFont('helvetica', 'bold');
+        doc.text(formatSoles(ad.subtotal), 175, y + 3.8);
+        doc.setFont('helvetica', 'normal');
+        y += 5;
+      });
+      doc.setFillColor(248, 250, 252);
+      doc.rect(15, y, 180, 5, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(31, 78, 156);
+      doc.text('Total adicionales:', 140, y + 3.8);
+      doc.text(formatSoles(totalAdicPdf), 175, y + 3.8);
+      y += 6;
+    }
+
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text('* Importes referenciales para el prototipo. Tarifas simuladas y configurables.', 18, y + 3.5);
+
+    // 7. Pie de Página Formal para el Cliente
     y = 270;
     doc.setDrawColor(203, 213, 225);
     doc.setLineWidth(0.5);
@@ -2696,8 +3216,28 @@
         return;
       }
       dom.errorPaso2.textContent = '';
-      irPaso(3);
+      if (!hayCambiosDeHorario() && hayCambiosPendientes()) {
+        irPaso(4);
+      } else {
+        irPaso(3);
+      }
     });
+
+    // Listeners de adicionales
+    if (dom.selAdicional) {
+      dom.selAdicional.addEventListener('change', actualizarFormAdicionalCampos);
+    }
+    if (dom.numAdicionalCantidad) {
+      dom.numAdicionalCantidad.addEventListener('input', recalcularSubtotalFormAdicional);
+    }
+    if (dom.numAdicionalHoras) {
+      dom.numAdicionalHoras.addEventListener('input', recalcularSubtotalFormAdicional);
+    }
+    if (dom.btnAgregarAdicional) {
+      dom.btnAgregarAdicional.addEventListener('click', agregarOActualizarAdicional);
+    }
+    window.editarAdicionalAsesor = editarAdicional;
+    window.eliminarAdicionalAsesor = eliminarAdicional;
 
     dom.btnDescartarPaso2.addEventListener('click', () => {
       if (hayCambiosPendientes()) {

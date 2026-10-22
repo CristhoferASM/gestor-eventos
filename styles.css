@@ -2437,4 +2437,329 @@ input.input-error {
   }
 }
 
+/* ===== 21. ESTILOS DE GESTIÓN DE ADICIONALES (ASESOR Y CLIENTE) ===== */
+.seccion-adicionales-evento {
+  margin-top: 24px;
+  border-top: 1px solid var(--borde);
+  padding-top: 18px;
+}
+
+.adicionales-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.adicionales-cabecera h3 {
+  margin: 0 0 4px 0;
+  color: var(--primario);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nota-referencial-prototipo {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-left: 6px;
+  letter-spacing: 0.2px;
+}
+
+.adicionales-form-card {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(19, 38, 74, 0.04);
+}
+
+.adicionales-form-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 2fr) minmax(110px, 1fr) minmax(110px, 1fr) minmax(120px, 1fr) minmax(130px, 1.2fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.campo-adicional-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo-adicional-item label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primario);
+}
+
+.campo-adicional-item .select-adicional,
+.campo-adicional-item .input-numero,
+.campo-adicional-item .input-readonly {
+  width: 100%;
+  height: 38px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--borde);
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--texto);
+  background: var(--blanco);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.campo-adicional-item .select-adicional:focus,
+.campo-adicional-item .input-numero:focus {
+  border-color: var(--primario-2);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(31, 78, 156, 0.12);
+}
+
+.campo-adicional-item .input-readonly {
+  background: #f8fafc;
+  color: #334155;
+  cursor: default;
+  font-weight: 600;
+}
+
+.campo-adicional-item .subtotal-destacado {
+  color: var(--primario);
+  font-weight: 700;
+  background: #f0f4fc;
+  border-color: #cbd5e1;
+}
+
+.campo-adicional-accion {
+  display: flex;
+  align-items: flex-end;
+}
+
+.campo-adicional-accion .btn {
+  height: 38px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+}
+
+.tabla-adicionales-wrap {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+
+.tabla-adicionales {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.tabla-adicionales th {
+  background: var(--fondo);
+  color: var(--primario);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--borde);
+}
+
+.tabla-adicionales td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--borde);
+  color: var(--texto);
+  vertical-align: middle;
+}
+
+.tabla-adicionales tr:hover td {
+  background: #fbfcfe;
+}
+
+.fila-total-adicionales td {
+  background: #f8fafc;
+  font-size: 13.5px;
+  border-top: 2px solid var(--borde);
+}
+
+.btn-accion-adic {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-edit-adic {
+  color: var(--primario-2);
+  border-color: #cbd5e1;
+  background: #ffffff;
+}
+
+.btn-edit-adic:hover {
+  background: #eff6ff;
+  border-color: var(--primario-2);
+}
+
+.btn-delete-adic {
+  color: var(--error);
+  border-color: #fecaca;
+  background: #ffffff;
+  margin-left: 4px;
+}
+
+.btn-delete-adic:hover {
+  background: #fef2f2;
+  border-color: var(--error);
+}
+
+.adicionales-vacio-msg {
+  padding: 18px;
+  text-align: center;
+  color: var(--gris);
+  font-size: 13.5px;
+  background: #fafbfc;
+}
+
+/* Resumen Comparativo de Adicionales (Paso 4 Asesor / Paso 3 Cliente) */
+.resumen-adicionales-box {
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 18px;
+  margin: 18px 0;
+  box-shadow: 0 1px 4px rgba(19, 38, 74, 0.05);
+}
+
+.resumen-adicionales-cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--borde);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.resumen-adicionales-titulo {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--primario);
+}
+
+.tabla-comparativo-adicionales {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.tabla-comparativo-adicionales th {
+  background: var(--fondo);
+  color: var(--primario);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--borde);
+  text-align: left;
+}
+
+.tabla-comparativo-adicionales td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla-comparativo-adicionales tr.fila-adicional-modificada {
+  background: #fffcf4;
+}
+
+.badge-adic-variacion {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.badge-adic-inc {
+  background: #e6f7ef;
+  color: #1e8e5a;
+  border: 1px solid #a3e0c0;
+}
+
+.badge-adic-red {
+  background: #f0f4fa;
+  color: #1f4e9c;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-adic-igual {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.nota-adicionales-pie {
+  margin-top: 10px;
+  margin-bottom: 0;
+  font-size: 11.5px;
+  color: var(--gris);
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .adicionales-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .campo-adicional-item.campo-adic-select {
+    grid-column: 1 / -1;
+  }
+  .campo-adicional-accion {
+    grid-column: 1 / -1;
+  }
+  .campo-adicional-accion .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .tabla-adicionales,
+  .tabla-comparativo-adicionales {
+    font-size: 12px;
+  }
+  .tabla-adicionales th,
+  .tabla-adicionales td,
+  .tabla-comparativo-adicionales th,
+  .tabla-comparativo-adicionales td {
+    padding: 8px 6px;
+  }
+  .btn-accion-adic {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+}
+
+
 

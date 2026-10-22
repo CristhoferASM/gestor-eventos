@@ -468,6 +468,102 @@
           <div class="resumen-horario-items" id="resumenHorarioItems"></div>
         </div>
 
+        <!-- Bloque: Adicionales del Evento -->
+        <div class="seccion-adicionales-evento" id="seccionAdicionalesAsesor">
+          <div class="adicionales-cabecera">
+            <div>
+              <h3>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                Adicionales del evento
+              </h3>
+              <p class="ayuda" style="margin-top: 2px; margin-bottom: 8px;">
+                Gestione los recursos y servicios adicionales solicitados para el evento.
+                <span class="nota-referencial-prototipo">Importes referenciales para el prototipo</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Formulario de captura y edición de adicional -->
+          <div class="adicionales-form-card">
+            <div class="adicionales-form-grid">
+              <div class="campo-adicional-item campo-adic-select">
+                <label for="selAdicional">Adicional</label>
+                <select id="selAdicional" class="select-adicional">
+                  <option value="cochera">Cochera (S/ 10.00 / h)</option>
+                  <option value="pantalla_led_5x4">Pantalla LED 5×4 (S/ 200.00 / h)</option>
+                  <option value="pantalla_led_4x3">Pantalla LED 4×3 (S/ 150.00 / h)</option>
+                  <option value="microfono">Micrófono (S/ 5.00 / h)</option>
+                  <option value="teleprompter">Teleprompter (S/ 10.00 / h)</option>
+                </select>
+              </div>
+
+              <div class="campo-adicional-item">
+                <label for="numAdicionalCantidad" id="lblAdicionalCantidad">Cantidad de unidades</label>
+                <input type="number" id="numAdicionalCantidad" min="1" step="1" value="1" class="input-numero" aria-label="Cantidad de unidades">
+              </div>
+
+              <div class="campo-adicional-item">
+                <label for="numAdicionalHoras">Horas de uso</label>
+                <input type="number" id="numAdicionalHoras" min="1" step="1" value="1" class="input-numero" aria-label="Horas de uso">
+              </div>
+
+              <div class="campo-adicional-item">
+                <label for="txtAdicionalTarifa">Tarifa por hora</label>
+                <input type="text" id="txtAdicionalTarifa" readonly class="input-readonly" value="S/ 10.00" aria-label="Tarifa por hora de solo lectura">
+              </div>
+
+              <div class="campo-adicional-item">
+                <label for="txtAdicionalSubtotal">Subtotal</label>
+                <input type="text" id="txtAdicionalSubtotal" readonly class="input-readonly subtotal-destacado" value="S/ 10.00" aria-label="Subtotal calculado">
+              </div>
+
+              <div class="campo-adicional-accion">
+                <button type="button" class="btn btn-primario" id="btnAgregarAdicional">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span id="btnAgregarAdicionalTexto">Agregar adicional</span>
+                </button>
+              </div>
+            </div>
+            <span class="msg-error-campo" id="errAdicionalForm"></span>
+          </div>
+
+          <!-- Tabla de adicionales agregados -->
+          <div class="tabla-adicionales-wrap">
+            <table class="tabla-adicionales" id="tablaAdicionales">
+              <thead>
+                <tr>
+                  <th>Adicional</th>
+                  <th style="text-align: center;">Cantidad</th>
+                  <th style="text-align: center;">Horas de uso</th>
+                  <th style="text-align: right;">Tarifa por hora</th>
+                  <th style="text-align: right;">Subtotal</th>
+                  <th style="text-align: center;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyAdicionales">
+                <!-- Se inyecta dinámicamente -->
+              </tbody>
+              <tfoot>
+                <tr class="fila-total-adicionales">
+                  <td colspan="4" style="text-align: right; font-weight: bold;">Total de adicionales:</td>
+                  <td style="text-align: right; font-weight: bold; color: var(--primario);" id="totalAdicionalesTabla">S/ 0.00</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+            <div class="adicionales-vacio-msg oculto" id="msgAdicionalesVacio">
+              No hay adicionales agregados para este evento.
+            </div>
+          </div>
+        </div>
+
         <div class="msg-error" id="errorPaso2"></div>
 
         <!-- Acciones del Paso 2 -->
@@ -554,6 +650,9 @@
 
         <!-- Resumen de Duración e Importe Adicional Estimado -->
         <div id="durationSummaryContainer"></div>
+
+        <!-- Comparativo y Resumen de Adicionales -->
+        <div id="adicionalesSummaryContainer"></div>
 
         <!-- Botón secundario reconocible para alternar la ficha completa -->
         <div class="ficha-toggle-wrapper">
