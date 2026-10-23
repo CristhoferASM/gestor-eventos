@@ -93,6 +93,16 @@ header {
   flex-shrink: 0;
 }
 
+.btn-cerrar-sesion {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-cerrar-sesion:hover {
+  background: rgba(192, 57, 43, 0.4);
+  border-color: rgba(192, 57, 43, 0.7);
+}
+
 /* ===== 4. CONTENIDO PRINCIPAL Y TÍTULOS ===== */
 main {
   max-width: 1100px;

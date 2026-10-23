@@ -332,4 +332,84 @@ Se documentan los siguientes puntos comerciales para definición con la gerencia
 7. **Tarifación de tiempos técnicos adicionales:** Falta determinar si el montaje previo, desmontaje posterior y ensayo técnico tienen una tarifa diferenciada de soporte técnico o si se consideran cortesía según el tipo de paquete contratado.
 8. **Límites de días de montaje/desmontaje:** Falta confirmar si el montaje puede programarse en días calendario previos a la fecha del evento principal o si debe restringirse estrictamente a la misma jornada.
 
+---
+
+## 10. Prototipo de Inicio de Sesión y Verificación en Dos Pasos (2FA)
+
+Se incorporó la pantalla de acceso corporativo `inicio.html` con su flujo simulado de autenticación y verificación en dos factores (2FA), preservando íntegramente las vistas del asesor (`index.html`), el portal del cliente (`cliente.html`), el catálogo de adicionales y la persistencia de datos en `localStorage`.
+
+### 1. Estructura y Archivos
+- **`inicio.html`:** Interfaz de acceso con diseño visual basado en las especificaciones de marca (azul marino `#13264a`, azul `#1f4e9c`, dorado `#f2a900`, fondo `#f5f7fb`).
+- **`acceso.css`:** Estilos delimitados para la tarjeta de acceso, botones sociales, casillas de 6 dígitos, modales y adaptabilidad móvil (`390px` y `1440px`).
+- **`acceso.js`:** Controlador de interacción, validaciones de formulario, máquina de estados de tres fases, simulación de acceso social y verificación en dos factores.
+
+### 2. Cuentas Ficticias de Demostración
+Para fines exclusivos de evaluación de interfaz y flujos, se definen dos cuentas ficticias. **No se solicita ni almacena ninguna contraseña real:**
+
+| Rol | Correo ficticio | Contraseña demo | Destino tras 2FA | Correo enmascarado (2FA) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Asesor comercial** | `asesor@showtech.com` | `Asesor2026!` | `index.html` | `as***@showtech.com` |
+| **Cliente (Promoción Horizonte)** | `cliente@horizonte.com` | `Cliente2026!` | `cliente.html` | `cl***@horizonte.com` |
+
+> [!NOTE]
+> En la pantalla de ingreso se proveen los botones de atajo **"Asesor"** y **"Cliente"** para autocompletar rápidamente las credenciales sin necesidad de digitación manual.
+
+### 3. Código de Verificación de Prueba (2FA)
+- **Código válido predeterminado:** `123456`
+- **Ayuda en pantalla:** La interfaz ofrece la insignia interactiva *"Código de prueba: 123456"* con botón **"Autocompletar"** para rellenar automáticamente las 6 casillas.
+
+### 4. Flujo y Guion de Demostración
+
+#### Fase 1: Inicio de Sesión (`inicio.html`)
+1. **Validaciones en tiempo real:**
+   - Si se presiona *Ingresar* con campos vacíos, se marcan en rojo y se muestran los mensajes de error correspondientes junto a cada campo.
+   - Si se escribe un correo con formato inválido (ej. `correo-invalido`), se informa la estructura requerida (`usuario@correo.com`).
+   - Si se ingresan credenciales que no coinciden con las cuentas demo, se despliega una alerta con mensaje genérico.
+2. **Visibilidad de contraseña:**
+   - El botón con icono de ojo permite alternar entre texto oculto (`password`) y visible (`text`).
+3. **Flujo de recuperación de contraseña:**
+   - Al pulsar *"¿Olvidaste tu contraseña?"*, se abre un diálogo modal informando de manera accesible que la recuperación por correo transaccional está en fase de desarrollo.
+   - **Alcance de cuentas y registro:** Por indicación de ingeniería, se retiró el registro público de usuarios y no se incluye la pantalla *"Crea tu cuenta"*. El acceso al sistema se realiza a través de las credenciales autorizadas asignadas (o mediante la selección simulada de cuentas en Google y Facebook).
+4. **Acceso social simulado (Google y Facebook):**
+   - Los botones *"Continuar con Google"* y *"Continuar con Facebook"* abren un modal explícitamente identificado como *"Simulación de acceso con [Google/Facebook]"*.
+   - No solicita contraseñas de dichos proveedores; permite seleccionar la cuenta de Asesor o Cliente para continuar al segundo factor o cancelar y regresar.
+
+#### Fase 2: Selección del Método de Verificación (2FA)
+Tras validar la cuenta ficticia, se presenta la pantalla con el identificador *"02 · Método de verificación"*:
+- Muestra el correo de la cuenta activa y la insignia discreta *"Verificación de demostración"*.
+- Permite seleccionar entre:
+  1. **Aplicación autenticadora:** *"Usa el código de tu aplicación."*
+  2. **Correo electrónico:** *"Recibe un código en tu correo registrado."*
+- Cuenta con el botón *"Continuar"* y el enlace *"Volver al inicio de sesión"*.
+
+#### Fase 3: Ingreso y Validación del Código de 6 Dígitos
+Identificada con *"03 · Confirmar acceso"*:
+- **Casillas de 6 dígitos:** Componente ergonómico que admite escritura con teclado numérico, avance automático al siguiente dígito, borrado retroactivo con `Backspace`, navegación con flechas y pegado directo del código completo desde el portapapeles.
+- **Diferenciación por método:**
+  - *Aplicación autenticadora:* Indica que el código se consulta en la aplicación vinculada. No muestra reenvíos ni afirma haber despachado correos.
+  - *Correo electrónico:* Muestra el correo ficticio parcialmente enmascarado e incluye el botón *"Reenviar código"* con temporizador de espera visible (30s) y aviso de reenvío simulado.
+- **Estados de validación contemplados:**
+  - *Código incompleto:* Alerta cuando se presiona verificar con menos de 6 dígitos.
+  - *Código incorrecto:* Alerta si los 6 dígitos no coinciden con `123456`.
+  - *Código vencido:* Temporizador de vigencia (60s) y botón *"Simular vencimiento"* para comprobar el mensaje de expiración y solicitar nuevo código.
+  - *Invalidación de desafío:* Reenviar el código o hacer clic en *"Usar otro método"* invalida el desafío anterior y limpia los campos y temporizadores.
+
+#### Fase 4: Finalización y Navegación
+- Tras ingresar `123456`, el sistema redirige automáticamente a la vista asociada al rol:
+  - Cuenta Asesor &rarr; `index.html`.
+  - Cuenta Cliente &rarr; `cliente.html`.
+- Se registra el estado de acceso exclusivamente en `sessionStorage` (`showtech_demo_session`).
+- **Botón "Cerrar sesión":** Se encuentra visible en la barra superior de `index.html` y `cliente.html`. Al pulsarlo, se elimina el estado de sesión en `sessionStorage` y se regresa a `inicio.html`.
+- **Conservación absoluta de datos:** El cierre de sesión no borra ningún evento, solicitud o modificación guardada en `localStorage`.
+- **Ausencia de parpadeo (flicker):** La sincronización de sesión se ejecuta de forma síncrona en el renderizado sin ocultar el contenido ni generar saltos visuales.
+
+### 5. Integraciones Pendientes para un Entorno de Producción Real
+Este desarrollo corresponde a una entrega de demostración de interfaz de usuario. En una arquitectura de producción deberán incorporarse las siguientes integraciones reales:
+
+1. **Protocolo OAuth 2.0 / OpenID Connect:** Integración real con Google Identity Services y Facebook Login SDK mediante tokens criptográficos (JWT) y validación en backend.
+2. **Generador TOTP (RFC 6238):** Servicio de autenticación TOTP con clave secreta compartida y código QR para emparejamiento con Google Authenticator o Microsoft Authenticator.
+3. **Servicio SMTP / API Transaccional:** Integración con proveedores de correo transaccional (ej. SendGrid, Amazon SES) para despacho de códigos OTP con expiración estricta y protección antifraude.
+4. **Protección contra ataques de fuerza bruta:** Limitador de tasa (*Rate limiting*), bloqueo temporal tras intentos fallidos y reCAPTCHA / Cloudflare Turnstile.
+5. **Sesiones Seguras en Servidor:** Almacenamiento de tokens en cookies seguras con directivas `HttpOnly`, `Secure` y `SameSite=Strict`. Las redirecciones y validaciones en navegador no constituyen por sí mismas una barrera de seguridad de datos.
+
 
