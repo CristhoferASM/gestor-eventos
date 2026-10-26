@@ -35,8 +35,109 @@ const CUENTAS_DEMO = {
 };
 
 const DEMO_SESSION_KEY = 'showtech_demo_session';
+const RECORDATORIO_ASESOR_KEY = 'showtech_recordatorio_verificacion_asesor';
+const ZONA_HORARIA_PERU = 'America/Lima';
 const TIEMPO_EXPIRACION_SEGUNDOS = 60;
 const TIEMPO_REENVIO_SEGUNDOS = 30;
+
+// ----------------------------------------------------------------------------
+// 1.1 Utilidades de Fecha/Hora (America/Lima) y Recordatorio Diario del Asesor
+// ----------------------------------------------------------------------------
+function obtenerAhora() {
+  if (typeof window !== 'undefined' && window.__SHOWTECH_RELOJ_CONTROLABLE__ instanceof Date) {
+    return new Date(window.__SHOWTECH_RELOJ_CONTROLABLE__.getTime());
+  }
+  return new Date();
+}
+
+function obtenerFechaCalendarioLima(fechaRef) {
+  const fecha = fechaRef || obtenerAhora();
+  const formateador = new Intl.DateTimeFormat('en-US', {
+    timeZone: ZONA_HORARIA_PERU,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  const partes = formateador.formatToParts(fecha);
+  const anio = partes.find(p => p.type === 'year').value;
+  const mes = partes.find(p => p.type === 'month').value;
+  const dia = partes.find(p => p.type === 'day').value;
+  return `${anio}-${mes}-${dia}`;
+}
+
+function obtenerRecordatorioValido(emailCuenta) {
+  if (!emailCuenta || typeof emailCuenta !== 'string') return null;
+
+  try {
+    const raw = localStorage.getItem(RECORDATORIO_ASESOR_KEY);
+    if (!raw) return null;
+
+    const registro = JSON.parse(raw);
+    if (!registro || typeof registro !== 'object') return null;
+
+    // Identificador estable de la cuenta ("de otra cuenta debe exigir verificación")
+    if (typeof registro.cuentaId !== 'string' ||
+        registro.cuentaId.toLowerCase().trim() !== emailCuenta.toLowerCase().trim()) {
+      return null;
+    }
+
+    // Formato estricto de fecha en Perú (YYYY-MM-DD)
+    if (typeof registro.diaPeru !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(registro.diaPeru)) {
+      return null;
+    }
+
+    // Marca temporal ISO válida
+    if (typeof registro.fechaVerificacionIso !== 'string') {
+      return null;
+    }
+    const fechaVerif = new Date(registro.fechaVerificacionIso);
+    if (isNaN(fechaVerif.getTime())) {
+      return null;
+    }
+
+    // Recalcular el día actual de Perú en este preciso instante
+    const ahora = obtenerAhora();
+    const diaActualPeru = obtenerFechaCalendarioLima(ahora);
+
+    // Un registro de fecha futura debe exigir verificación
+    if (registro.diaPeru > diaActualPeru || fechaVerif.getTime() > ahora.getTime() + 1000) {
+      return null;
+    }
+
+    // Un registro de un día anterior debe exigir verificación
+    if (registro.diaPeru !== diaActualPeru) {
+      return null;
+    }
+
+    // Consistencia interna: la fecha ISO guardada debe corresponder al día de Perú guardado
+    if (obtenerFechaCalendarioLima(fechaVerif) !== registro.diaPeru) {
+      return null;
+    }
+
+    return registro;
+  } catch (e) {
+    // Si localStorage falla o está corrupto, exigir verificación
+    return null;
+  }
+}
+
+function guardarRecordatorioAsesor(emailCuenta) {
+  const ahora = obtenerAhora();
+  const diaPeru = obtenerFechaCalendarioLima(ahora);
+  const registro = {
+    cuentaId: emailCuenta.toLowerCase().trim(),
+    diaPeru: diaPeru,
+    fechaVerificacionIso: ahora.toISOString()
+  };
+
+  try {
+    localStorage.setItem(RECORDATORIO_ASESOR_KEY, JSON.stringify(registro));
+    return true;
+  } catch (e) {
+    console.warn('No se pudo guardar el recordatorio en localStorage:', e);
+    return false;
+  }
+}
 
 // ----------------------------------------------------------------------------
 // 2. Estado del Prototipo de Acceso
@@ -89,6 +190,7 @@ const dom = {
   // Pantalla 2: Verificación por correo
   pantallaCodigo: document.getElementById('pantallaCodigo'),
   lblEmailDestino: document.getElementById('lblEmailDestino'),
+  ayudaFrecuenciaAsesor: document.getElementById('ayudaFrecuenciaAsesor'),
   instruccionMetodoTexto: document.getElementById('instruccionMetodoTexto'),
   valorCodigoPrueba: document.getElementById('valorCodigoPrueba'),
   btnToggleVerCodigo: document.getElementById('btnToggleVerCodigo'),
@@ -294,12 +396,51 @@ function procesarLogin() {
   }
 
   if (cuentaEncontrada) {
+    // Si la cuenta es asesor, comprobar si ya completó la verificación hoy en America/Lima
+    if (cuentaEncontrada.rol === 'asesor') {
+      const recordatorio = obtenerRecordatorioValido(cuentaEncontrada.email);
+      if (recordatorio) {
+        // Omite la pantalla del código y crea la sesión reutilizando la verificación del día
+        iniciarSesionConRecordatorio(cuentaEncontrada, recordatorio);
+        return;
+      }
+    }
+
     estado.cuentaSeleccionada = cuentaEncontrada;
-    mostrarPaso(2); // Pasa directamente a la verificación por correo
+    mostrarPaso(2); // Pasa a la verificación por correo
   } else {
     dom.textoErrorCredenciales.textContent = 'El correo electrónico o la contraseña ingresados no coinciden con las cuentas de demostración.';
     dom.alertaErrorCredenciales.classList.remove('oculto');
   }
+}
+
+function iniciarSesionConRecordatorio(cuenta, recordatorio) {
+  const ahora = obtenerAhora();
+  const sesionReutilizada = {
+    email: cuenta.email,
+    nombre: cuenta.nombre,
+    rol: cuenta.rol,
+    rolEtiqueta: cuenta.rolEtiqueta,
+    metodoVerificacion: 'recordatorio_diario',
+    verificacionReutilizada: true,
+    fechaVerificacionOriginal: recordatorio.fechaVerificacionIso,
+    diaPeru: recordatorio.diaPeru,
+    autenticado: true,
+    timestamp: ahora.toISOString()
+  };
+
+  try {
+    sessionStorage.setItem(DEMO_SESSION_KEY, JSON.stringify(sesionReutilizada));
+  } catch (e) {
+    console.warn('Error guardando sesión en sessionStorage:', e);
+  }
+
+  dom.btnIngresar.disabled = true;
+  dom.btnIngresar.innerHTML = '<span>Ingresando...</span>';
+
+  setTimeout(() => {
+    window.location.href = cuenta.destino;
+  }, 200);
 }
 
 // ----------------------------------------------------------------------------
@@ -450,6 +591,14 @@ function prepararPasoCodigo() {
     dom.lblEmailDestino.textContent = 'tu correo registrado';
   }
 
+  if (dom.ayudaFrecuenciaAsesor) {
+    if (estado.cuentaSeleccionada && estado.cuentaSeleccionada.rol === 'asesor') {
+      dom.ayudaFrecuenciaAsesor.classList.remove('oculto');
+    } else {
+      dom.ayudaFrecuenciaAsesor.classList.add('oculto');
+    }
+  }
+
   dom.btnVerificarCodigo.disabled = false;
   dom.btnVerificarCodigo.innerHTML = '<span>Verificar e ingresar</span>';
 
@@ -577,14 +726,22 @@ function verificarCodigo() {
 function finalizarAutenticacionExitosa() {
   limpiarTemporizadores();
 
+  const ahora = obtenerAhora();
+
+  // Si la cuenta es asesor, guardar recordatorio diario en localStorage
+  if (estado.cuentaSeleccionada && estado.cuentaSeleccionada.rol === 'asesor') {
+    guardarRecordatorioAsesor(estado.cuentaSeleccionada.email);
+  }
+
   const sesionDemo = {
     email: estado.cuentaSeleccionada.email,
     nombre: estado.cuentaSeleccionada.nombre,
     rol: estado.cuentaSeleccionada.rol,
     rolEtiqueta: estado.cuentaSeleccionada.rolEtiqueta,
     metodoVerificacion: 'email',
+    verificacionReutilizada: false,
     autenticado: true,
-    timestamp: new Date().toISOString()
+    timestamp: ahora.toISOString()
   };
 
   try {
@@ -818,6 +975,24 @@ function mostrarToast(mensaje, tipo = 'info') {
     toast.style.transition = 'opacity 0.3s ease';
     setTimeout(() => toast.remove(), 300);
   }, 4000);
+}
+
+// Exponer helpers para pruebas controlables y diagnóstico
+if (typeof window !== 'undefined') {
+  window.__SHOWTECH_AUTH__ = {
+    obtenerAhora,
+    setRelojControlable: (fecha) => {
+      window.__SHOWTECH_RELOJ_CONTROLABLE__ = fecha ? new Date(fecha) : null;
+    },
+    obtenerFechaCalendarioLima,
+    obtenerRecordatorioValido,
+    guardarRecordatorioAsesor,
+    iniciarSesionConRecordatorio,
+    RECORDATORIO_ASESOR_KEY,
+    DEMO_SESSION_KEY,
+    CUENTAS_DEMO,
+    estado
+  };
 }
 
 // Inicializar al cargar

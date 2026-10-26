@@ -422,7 +422,45 @@ Aplica al acceso por correo y contraseña (Asesor y Cliente):
   - Evita restaurar automáticamente la sesión de Google tras cerrar sesión.
 - **Integridad de datos de negocio:** Los eventos, adicionales, solicitudes y pagos almacenados en `localStorage` no se modifican, eliminan ni migran.
 
-### 5. Configuración Externa de Firebase Authentication
+### 5. Verificación Diaria por Día Calendario del Asesor Comercial (`America/Lima`)
+
+Para optimizar la experiencia del **Asesor(a) comercial** (`asesor@showtech.com`) sin comprometer el flujo de demostración, se implementó una regla de verificación de código por correo **únicamente una vez por día calendario, por cuenta y por navegador**:
+
+1. **Exclusividad para el Asesor Comercial:**
+   - Esta regla aplica **estrictamente a la cuenta del asesor comercial**.
+   - El cliente de demostración (`cliente@horizonte.com`) que ingresa con correo y contraseña continúa completando el desafío de verificación de 6 dígitos en cada inicio de sesión.
+   - El inicio de sesión real con Google mediante Firebase Authentication y la simulación interactiva con Facebook se mantienen intactos.
+
+2. **Vigencia por Día Calendario (`America/Lima`):**
+   - La validez de la verificación no es un lapso rodante de 24 horas, sino que se extiende **hasta las 23:59:59 del día calendario en curso de Perú (UTC-5)**.
+   - *Ejemplo práctico:* Si el asesor completa la verificación el lunes a las 23:50, al llegar la medianoche del martes (00:00 hora de Perú) el recordatorio expira y el primer inicio del martes volverá a solicitar el código de 6 dígitos.
+   - El cálculo de la fecha se realiza dinámicamente mediante `Intl.DateTimeFormat` con `{ timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit' }`. Se recalcula en tiempo real al verificar credenciales y al confirmar códigos (sin retener fechas fijas de carga inicial de página), garantizando independencia de la zona horaria del navegador y de la hora UTC.
+
+3. **Diferencia entre Sesión Activa y Recordatorio Diario:**
+   - **Sesión activa (`sessionStorage`):** Almacenada bajo la clave `showtech_demo_session`. Se crea **únicamente** después de validar credenciales correctas y cumplir la condición de verificación (código confirmado o recordatorio vigente del día). Desaparece al cerrar la pestaña/navegador o al pulsar *"Cerrar sesión"*. Si el asesor ingresa mediante el recordatorio, la sesión registra explícitamente `metodoVerificacion: 'recordatorio_diario'` y `verificacionReutilizada: true` (no se presenta falsamente como un código recién validado).
+   - **Recordatorio diario (`localStorage`):** Almacenado bajo la clave exclusiva `showtech_recordatorio_verificacion_asesor`. Guarda un registro mínimo:
+     ```json
+     {
+       "cuentaId": "asesor@showtech.com",
+       "diaPeru": "2026-10-26",
+       "fechaVerificacionIso": "2026-10-26T21:10:45.000Z"
+     }
+     ```
+     No almacena contraseñas, códigos OTP ni tokens de autenticación.
+   - **Persistencia tras cerrar sesión:** Al pulsar *"Cerrar sesión"*, se elimina la sesión activa de `sessionStorage` y se devuelve al usuario a `inicio.html`. Sin embargo, el recordatorio diario en `localStorage` **se conserva intacto**. Si el asesor vuelve a iniciar sesión el mismo día, deberá ingresar obligatoriamente su correo y contraseña; una vez validadas sus credenciales, el sistema detecta el recordatorio vigente y lo dirige directo a `index.html` sin solicitar el código.
+   - **No existe inicio de sesión automático:** El recordatorio nunca inicia sesión por sí mismo ni exime de escribir la contraseña. Una contraseña incorrecta con recordatorio válido es rechazada de inmediato.
+   - **Sesión a medianoche:** Si el asesor tiene una sesión abierta cuando llega la medianoche, su trabajo en curso no se interrumpe ni se cierra forzosamente; la expiración del recordatorio se comprueba en el siguiente inicio de sesión.
+   - **Aislamiento por navegador y cuenta:** Abrir la aplicación desde otro navegador, ventana de incógnito o tras borrar los datos del sitio volverá a solicitar el código al no existir el registro local. Asimismo, el registro de una cuenta no permite omitir la verificación en otra.
+   - **Resiliencia ante fallos de almacenamiento:** Si `localStorage` está inhabilitado o falla por cuotas, el asesor puede continuar a `index.html` tras verificar su código, pero no se afirma falsamente haber guardado el recordatorio y en el siguiente inicio se volverá a solicitar el código.
+
+4. **Advertencia de Seguridad del Prototipo Local:**
+   > [!WARNING]
+   > **Aclaración Arquitectónica de Seguridad:**
+   > La implementación de este recordatorio diario mediante `localStorage` y cálculo horario del cliente pertenece **exclusivamente al entorno de prototipo frontend**.
+   > - `localStorage` y el reloj local del equipo no constituyen un mecanismo de seguridad apto para producción, dado que pueden ser manipulados desde las herramientas de desarrollo del navegador.
+   > - En la arquitectura definitiva de producción de **Showtech Solutions**, la frecuencia de verificación multifactor (MFA), la persistencia del estado "dispositivo recordado por el día" (Trusted Device / Session Fingerprinting) y la vigencia temporal deben ser calculadas, emitidas y validadas **estrictamente en el backend (servidor)** mediante cookies `HttpOnly`, `SameSite=Strict`, `Secure` y tokens criptográficos firmados vinculados a la sesión de base de datos.
+
+### 6. Configuración Externa de Firebase Authentication
 
 Para que el popup de Google funcione sin errores de dominio no autorizado (`auth/unauthorized-domain`), deben estar registrados los siguientes dominios en Firebase Console:
 
