@@ -2771,5 +2771,46 @@ input.input-error {
   }
 }
 
+/* ==========================================================================
+   ESTILOS DE INTEGRACIÓN GOOGLE FIREBASE AUTH Y ESTADO VACÍO DE CUENTA
+   ========================================================================== */
+.avatar-google-header {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.badge-google {
+  background: #f1f5f9 !important;
+  color: #1e3a8a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.tarjeta-estado-vacio {
+  background: var(--blanco);
+  border: 1.5px dashed var(--borde);
+  border-radius: 12px;
+  padding: 44px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.icono-estado-vacio {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  background: #eff6ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primario-2);
+}
+
+
 
 

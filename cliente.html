@@ -13,8 +13,8 @@
   <header>
     <div class="marca">SHOWTECH <span>SOLUTIONS</span></div>
     <div class="header-der">
-      <span class="usuario">Usuario: Cliente</span>
-      <span class="badge-cliente-header">Promoción Horizonte 2026</span>
+      <span class="usuario" id="headerUsuarioTexto">Cargando identidad...</span>
+      <span class="badge-cliente-header" id="headerBadgeCliente" style="display:none;"></span>
       <a href="index.html" class="btn-demo" title="Cambiar a vista del asesor comercial">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -23,7 +23,7 @@
         </svg>
         <span>Vista Asesor &rarr;</span>
       </a>
-      <button type="button" class="btn-demo btn-cerrar-sesion" id="btnCerrarSesion" title="Cerrar sesión simulada y volver a inicio">
+      <button type="button" class="btn-demo btn-cerrar-sesion" id="btnCerrarSesion" title="Cerrar sesión y volver a inicio">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
           <polyline points="16 17 21 12 16 7"></polyline>
@@ -34,7 +34,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="mainPortalCliente" style="opacity: 0; transition: opacity 0.2s ease;">
     <div class="encabezado-seccion">
       <h1>Solicitud de modificación de evento</h1>
       <p class="sub">Consulte sus reservas, proponga cambios en fechas, horarios o requerimientos y envíe su solicitud para evaluación del asesor comercial.</p>
@@ -738,33 +738,6 @@
   <script src="assets/vendor/flatpickr/flatpickr.min.js"></script>
   <script src="assets/vendor/flatpickr/es.js"></script>
   <script src="cliente.js"></script>
-  <script>
-    (function() {
-      // Sincronización de sesión de demostración
-      try {
-        var sesionRaw = sessionStorage.getItem('showtech_demo_session');
-        if (sesionRaw) {
-          var sesion = JSON.parse(sesionRaw);
-          var usuarioEl = document.querySelector('.usuario');
-          if (usuarioEl && sesion && sesion.nombre) {
-            usuarioEl.textContent = 'Usuario: ' + sesion.nombre;
-            usuarioEl.title = 'Sesión activa: ' + sesion.email;
-          }
-        }
-      } catch (e) {
-        console.warn('Error leyendo sesión demo:', e);
-      }
-
-      var btnCerrar = document.getElementById('btnCerrarSesion');
-      if (btnCerrar) {
-        btnCerrar.addEventListener('click', function() {
-          try {
-            sessionStorage.removeItem('showtech_demo_session');
-          } catch (e) {}
-          window.location.href = 'inicio.html';
-        });
-      }
-    })();
-  </script>
+  <script type="module" src="cliente-auth.js"></script>
 </body>
 </html>

@@ -174,120 +174,47 @@
 
 
       <!-- =====================================================================
-           FASE 2: SELECCIÓN DEL MÉTODO DE VERIFICACIÓN 2FA
-           ===================================================================== -->
-      <section class="pantalla-paso oculto" id="pantallaMetodo" aria-labelledby="tituloMetodo">
-        
-        <!-- Icono Escudo con Candado -->
-        <div class="icono-cabecera-card" aria-hidden="true">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Escudo con candado interior -->
-            <path d="M24 6L8 12V23C8 32.5 14.8 41.3 24 44C33.2 41.3 40 32.5 40 23V12L24 6Z"></path>
-            <rect x="18" y="22" width="12" height="10" rx="2"></rect>
-            <path d="M20 22V18C20 15.8 21.8 14 24 14C26.2 14 28 15.8 28 18V22"></path>
-          </svg>
-        </div>
-
-        <h2 class="titulo-card" id="tituloMetodo">Verificación en dos pasos</h2>
-        <p class="subtitulo-card">Elige cómo verificar tu identidad.</p>
-
-        <div class="badge-demo-wrap">
-          <span class="badge-demo">Verificación de demostración</span>
-        </div>
-
-        <!-- Resumen de cuenta activa seleccionada -->
-        <div class="resumen-cuenta-activa" id="resumenCuentaMetodo">
-          <span>Cuenta: <strong id="lblCuentaEmail">asesor@showtech.com</strong></span>
-          <span class="btn-pill-cuenta" id="lblCuentaRol">Asesor</span>
-        </div>
-
-        <!-- Opciones de verificación -->
-        <div class="opciones-2fa-lista" role="radiogroup" aria-label="Método de verificación">
-          
-          <!-- Opción 1: Aplicación autenticadora -->
-          <div 
-            class="opcion-2fa-item seleccionada" 
-            id="opcionMetodoApp" 
-            role="radio" 
-            aria-checked="true" 
-            tabindex="0"
-          >
-            <div class="opcion-2fa-radio">
-              <span class="opcion-2fa-radio-punto"></span>
-            </div>
-            <div class="opcion-2fa-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                <line x1="12" y1="18" x2="12.01" y2="18"></line>
-              </svg>
-            </div>
-            <div class="opcion-2fa-textos">
-              <div class="opcion-2fa-titulo">Aplicación autenticadora</div>
-              <div class="opcion-2fa-desc">Usa el código de tu aplicación.</div>
-            </div>
-          </div>
-
-          <!-- Opción 2: Correo electrónico -->
-          <div 
-            class="opcion-2fa-item" 
-            id="opcionMetodoEmail" 
-            role="radio" 
-            aria-checked="false" 
-            tabindex="0"
-          >
-            <div class="opcion-2fa-radio">
-              <span class="opcion-2fa-radio-punto"></span>
-            </div>
-            <div class="opcion-2fa-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-              </svg>
-            </div>
-            <div class="opcion-2fa-textos">
-              <div class="opcion-2fa-titulo">Correo electrónico</div>
-              <div class="opcion-2fa-desc">Recibe un código en tu correo registrado.</div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Botón Continuar -->
-        <button type="button" id="btnContinuarMetodo" class="btn-acceso-primario">
-          <span>Continuar</span>
-        </button>
-
-        <!-- Volver al login -->
-        <div class="link-volver-wrap">
-          <a href="#" id="linkVolverLogin" class="link-volver-login">Volver al inicio de sesión</a>
-        </div>
-      </section>
-
-
-      <!-- =====================================================================
-           FASE 3: INGRESO DEL CÓDIGO DE VERIFICACIÓN
+           FASE 2: VERIFICACIÓN POR CORREO ELECTRÓNICO
            ===================================================================== -->
       <section class="pantalla-paso oculto" id="pantallaCodigo" aria-labelledby="tituloCodigo">
         
-        <!-- Icono Escudo con Checkmark -->
+        <!-- Icono Cabecera: Correo electrónico -->
         <div class="icono-cabecera-card" aria-hidden="true">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Escudo con checkmark interior -->
-            <path d="M24 6L8 12V23C8 32.5 14.8 41.3 24 44C33.2 41.3 40 32.5 40 23V12L24 6Z"></path>
-            <polyline points="17 24 22 29 31 19"></polyline>
+            <rect x="6" y="10" width="36" height="28" rx="4"></rect>
+            <path d="M6 14L24 26L42 14"></path>
           </svg>
         </div>
 
-        <h2 class="titulo-card" id="tituloCodigo">Ingresa tu código</h2>
+        <h2 class="titulo-card" id="tituloCodigo">Revisa tu correo</h2>
         
-        <!-- Instrucción contextual variable según método -->
         <p class="subtitulo-card" id="instruccionMetodoTexto">
-          Escribe el código de 6 dígitos de tu aplicación autenticadora.
+          Ingresa el código de 6 dígitos para continuar.
         </p>
 
-        <!-- Ayuda contextual con código de demostración -->
+        <!-- Correo de destino parcialmente oculto procedente de la cuenta -->
+        <div class="destino-correo-badge" id="badgeDestinoCorreo">
+          <span>Código enviado a:</span>
+          <strong id="lblEmailDestino">as***@showtech.com</strong>
+        </div>
+
+        <!-- Indicación discreta de simulación (no afirma envío real) -->
+        <div class="aviso-simulacion-discreto" id="avisoSimulacionEnvio">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Envío simulado para evaluación · No se despachan correos reales</span>
+        </div>
+
+        <!-- Ayuda contextual con código dinámico de demostración -->
         <div class="ayuda-codigo-demo">
-          <div>Código de prueba: <strong id="valorCodigoPrueba">123456</strong></div>
+          <div class="ayuda-codigo-info">
+            <span class="ayuda-codigo-lbl">Código de prueba:</span>
+            <strong id="valorCodigoPrueba" class="codigo-prueba-valor">••••••</strong>
+            <button type="button" id="btnToggleVerCodigo" class="btn-ver-codigo" aria-label="Ver código de prueba">Ver código de prueba</button>
+          </div>
           <button type="button" id="btnAutollenarCodigo" class="btn-autollenar-codigo" title="Rellenar las 6 casillas con el código de prueba">Autocompletar</button>
         </div>
 
@@ -302,15 +229,14 @@
           <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="casilla-codigo" data-idx="5" aria-label="Dígito 6">
         </div>
 
-        <!-- Bloque de reenvío simulado (solo visible en método Correo) -->
-        <div class="bloque-reenvio-simulado oculto" id="bloqueReenvioSimulado">
+        <!-- Bloque de reenvío simulado -->
+        <div class="bloque-reenvio-simulado" id="bloqueReenvioSimulado">
           <div class="fila-reenvio">
-            <span>Reenvío simulado:</span>
+            <span>¿No recibiste el código?</span>
             <button type="button" id="btnReenviarCodigo" class="btn-reenviar-codigo" disabled>
               Reenviar código (<span id="cuentaAtrasReenvio">30</span>s)
             </button>
           </div>
-          <small style="color: var(--gris); font-size: 11px;">El reenvío genera un nuevo desafío en esta demostración.</small>
         </div>
 
         <!-- Simulación de expiración y control de prueba -->
@@ -334,9 +260,9 @@
           <span>Verificar e ingresar</span>
         </button>
 
-        <!-- Usar otro método -->
+        <!-- Volver al inicio de sesión -->
         <div class="link-volver-wrap">
-          <a href="#" id="linkUsarOtroMetodo" class="link-volver-login">Usar otro método</a>
+          <a href="#" id="linkVolverLogin" class="link-volver-login">Volver al inicio de sesión</a>
         </div>
 
         <!-- Pie de soporte -->
@@ -359,46 +285,34 @@
 
 
   <!-- =========================================================================
-       MODAL 1: SIMULACIÓN DE ACCESO SOCIAL (GOOGLE / FACEBOOK)
+       MODAL 1: ACCESO SIMULADO CON FACEBOOK
        ========================================================================= -->
   <div class="modal-overlay oculto" id="modalSocial" role="dialog" aria-modal="true" aria-labelledby="tituloModalSocial">
     <div class="modal-dialogo">
       <div class="modal-cabecera">
-        <h3 id="tituloModalSocial">Simulación de acceso con Google / Simulación de acceso con Facebook</h3>
+        <h3 id="tituloModalSocial">Continuar con Facebook</h3>
         <button type="button" class="btn-modal-cerrar" id="btnCerrarModalSocial" aria-label="Cerrar ventana">&times;</button>
       </div>
       <div class="modal-cuerpo">
-        <div class="modal-aviso-simulacion" id="avisoModalSocial">
-          Esta es una demostración de interfaz (Simulación de acceso con Google / Simulación de acceso con Facebook). Selecciona una de las cuentas ficticias para continuar hacia la verificación en dos pasos sin ingresar contraseñas del proveedor.
-        </div>
-
-        <p style="font-size: 13px; font-weight: 600;">Selecciona una cuenta de prueba:</p>
+        <p class="modal-social-subtitulo" id="subtituloModalSocial" style="margin: 0; font-size: 13.5px; color: var(--texto); line-height: 1.5;">
+          Selecciona tu cuenta para acceder a la plataforma:
+        </p>
 
         <div class="cuentas-sociales-lista">
-          <!-- Cuenta Asesor -->
-          <div class="item-cuenta-social seleccionado" id="itemSocialAsesor" tabindex="0">
-            <div class="avatar-cuenta-social">A</div>
-            <div class="info-cuenta-social">
-              <div class="nombre-cuenta-social">Asesor(a) comercial</div>
-              <div class="correo-cuenta-social">asesor@showtech.com</div>
-            </div>
-            <span class="btn-pill-cuenta">Rol: Asesor</span>
-          </div>
-
-          <!-- Cuenta Cliente -->
-          <div class="item-cuenta-social" id="itemSocialCliente" tabindex="0">
-            <div class="avatar-cuenta-social avatar-cliente">C</div>
+          <!-- Cuenta del Cliente (Única cuenta para acceso social local) -->
+          <div class="item-cuenta-social seleccionado" id="itemSocialCliente" tabindex="0" role="button" aria-pressed="true" aria-label="Cuenta de cliente: Promoción Horizonte 2026">
+            <div class="avatar-cuenta-social avatar-cliente" aria-hidden="true">PH</div>
             <div class="info-cuenta-social">
               <div class="nombre-cuenta-social">Promoción Horizonte 2026</div>
               <div class="correo-cuenta-social">cliente@horizonte.com</div>
             </div>
-            <span class="btn-pill-cuenta">Rol: Cliente</span>
+            <span class="btn-pill-cuenta">Cliente</span>
           </div>
         </div>
       </div>
       <div class="modal-pie">
         <button type="button" class="btn-modal-secundario" id="btnCancelarSocial">Cancelar</button>
-        <button type="button" class="btn-modal-primario" id="btnContinuarSocial">Continuar con cuenta seleccionada</button>
+        <button type="button" class="btn-modal-primario" id="btnContinuarSocial">Continuar</button>
       </div>
     </div>
   </div>
@@ -446,13 +360,13 @@
         <div class="modal-aviso-simulacion">
           <strong>Asistencia de Demostración</strong>
           <p style="margin-top: 4px;">
-            Para validar este prototipo, ten a mano las credenciales documentadas y el código de verificación de 6 dígitos.
+            Para validar este prototipo, ten a mano las credenciales autorizadas y consulta el código de verificación generado en pantalla pulsando "Ver código de prueba".
           </p>
         </div>
         <div style="font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
           <div>&bull; <strong>Mesa de ayuda:</strong> soporte@showtechsolutions.demo</div>
           <div>&bull; <strong>Anexo comercial:</strong> +51 (01) 480-2026 (Anexo 104)</div>
-          <div>&bull; <strong>Código de verificación de prueba:</strong> <code>123456</code></div>
+          <div>&bull; <strong>Verificación:</strong> Exclusivamente mediante código de 6 dígitos por correo electrónico.</div>
         </div>
       </div>
       <div class="modal-pie">
@@ -461,7 +375,7 @@
     </div>
   </div>
 
-  <!-- Lógica modular de acceso y verificación -->
-  <script src="acceso.js"></script>
+  <!-- Lógica modular de acceso y verificación (Módulo ES con Firebase Auth) -->
+  <script type="module" src="acceso.js"></script>
 </body>
 </html>

@@ -158,18 +158,25 @@ Se ejecutaron pruebas exhaustivas de integración y validación:
 
 ## 6. Instrucciones de Ejecución
 
-### Opción 1: Abrir directamente en el navegador (Sin servidor)
-1. Abra el explorador de archivos en la carpeta del proyecto: `c:\Users\crist\gestor-eventos`.
-2. Haga doble clic en el archivo [`index.html`](file:///c:/Users/crist/gestor-eventos/index.html).
-3. El módulo cargará de inmediato con persistencia activa en su navegador.
+> [!IMPORTANT]
+> **Requisito de Protocolo:** Debido al uso de módulos JavaScript estándar (`type="module"`) y la integración oficial de Firebase Authentication con popups OAuth 2.0, el proyecto **debe ejecutarse mediante un servidor HTTP local o GitHub Pages**, no mediante el protocolo `file://` (el cual bloquea la carga de módulos ES y los orígenes autorizados de Firebase).
 
-### Opción 2: Mediante servidor web local HTTP
-Si prefiere ejecutarlo mediante un servidor HTTP local en PowerShell:
+### Opción 1: Servidor web local HTTP (Recomendada)
+Ejecute un servidor HTTP en PowerShell desde la raíz del proyecto:
 ```powershell
 python -m http.server 8080
 ```
-- Vista del Asesor comercial: `http://localhost:8080/index.html`
-- Vista del Cliente (Portal de Solicitudes): `http://localhost:8080/cliente.html`
+O con Node.js (`npx serve`):
+```powershell
+npx serve -l 8080 .
+```
+- **Inicio de sesión (Portal de Acceso):** `http://localhost:8080/inicio.html`
+- **Vista del Asesor comercial:** `http://localhost:8080/index.html`
+- **Vista del Cliente (Portal de Solicitudes):** `http://localhost:8080/cliente.html`
+
+### Opción 2: Despliegue en GitHub Pages
+El proyecto puede alojarse directamente en GitHub Pages:
+- URL de producción: `https://cristhoferasm.github.io/gestor-eventos/`
 
 ---
 
@@ -334,82 +341,102 @@ Se documentan los siguientes puntos comerciales para definición con la gerencia
 
 ---
 
-## 10. Prototipo de Inicio de Sesión y Verificación en Dos Pasos (2FA)
+---
 
-Se incorporó la pantalla de acceso corporativo `inicio.html` con su flujo simulado de autenticación y verificación en dos factores (2FA), preservando íntegramente las vistas del asesor (`index.html`), el portal del cliente (`cliente.html`), el catálogo de adicionales y la persistencia de datos en `localStorage`.
+## 10. Prototipo de Inicio de Sesión y Verificación por Correo Electrónico
 
-### 1. Estructura y Archivos
-- **`inicio.html`:** Interfaz de acceso con diseño visual basado en las especificaciones de marca (azul marino `#13264a`, azul `#1f4e9c`, dorado `#f2a900`, fondo `#f5f7fb`).
-- **`acceso.css`:** Estilos delimitados para la tarjeta de acceso, botones sociales, casillas de 6 dígitos, modales y adaptabilidad móvil (`390px` y `1440px`).
-- **`acceso.js`:** Controlador de interacción, validaciones de formulario, máquina de estados de tres fases, simulación de acceso social y verificación en dos factores.
+Se actualizó la pantalla de acceso corporativo `inicio.html` para simplificar el flujo y utilizar **únicamente verificación mediante código por correo electrónico**, eliminando cualquier requerimiento de instalación o uso de aplicaciones autenticadoras. Se preservan íntegramente las vistas del asesor (`index.html`), el portal del cliente (`cliente.html`), el catálogo de adicionales y la persistencia de datos en `localStorage`.
 
-### 2. Cuentas Ficticias de Demostración
-Para fines exclusivos de evaluación de interfaz y flujos, se definen dos cuentas ficticias. **No se solicita ni almacena ninguna contraseña real:**
+### 1. Estructura y Archivos Modificados
+- **`inicio.html`:** Interfaz de acceso corporativo Showtech Solutions con recorrido simplificado de 2 pasos: *Iniciar sesión* &rarr; *Revisa tu correo* &rarr; *Acceder*. Se retiró la selección de método ("Elige cómo verificar tu identidad"), la opción de aplicación autenticadora y "Usar otro método".
+- **`acceso.css`:** Estilos adaptados para la tarjeta de acceso, insignia de correo de destino enmascarado, aviso discreto de simulación, controles de código de prueba dinámico, casillas de 6 dígitos, modales y adaptabilidad móvil (`390px` y `1440px`).
+- **`acceso.js`:** Controlador de interacción modular con máquina de estados simplificada (Login &rarr; Verificación por correo), generador de códigos de demostración dinámicos, temporizadores de vigencia (60s) y reenvío (30s), soporte de teclado y pegado de 6 dígitos, e invalidación de desafíos anteriores.
 
-| Rol | Correo ficticio | Contraseña demo | Destino tras 2FA | Correo enmascarado (2FA) |
+### 2. Cuentas Autorizadas de Demostración
+Para la evaluación de interfaz y flujos sin dependencias de backend, se utilizan cuentas autorizadas registradas en el sistema. **No se solicita ni almacena ninguna contraseña real:**
+
+| Rol | Correo autorizado | Contraseña demo | Destino tras verificación | Correo de destino enmascarado |
 | :--- | :--- | :--- | :--- | :--- |
 | **Asesor comercial** | `asesor@showtech.com` | `Asesor2026!` | `index.html` | `as***@showtech.com` |
 | **Cliente (Promoción Horizonte)** | `cliente@horizonte.com` | `Cliente2026!` | `cliente.html` | `cl***@horizonte.com` |
 
 > [!NOTE]
-> En la pantalla de ingreso se proveen los botones de atajo **"Asesor"** y **"Cliente"** para autocompletar rápidamente las credenciales sin necesidad de digitación manual.
+> En la pantalla de ingreso se proveen los botones de atajo rápido **"Asesor"** y **"Cliente"** para autocompletar las credenciales sin necesidad de digitación manual.
 
-### 3. Código de Verificación de Prueba (2FA)
-- **Código válido predeterminado:** `123456`
-- **Ayuda en pantalla:** La interfaz ofrece la insignia interactiva *"Código de prueba: 123456"* con botón **"Autocompletar"** para rellenar automáticamente las 6 casillas.
+### 3. Códigos Dinámicos y Ayuda de Demostración
+- **Generación dinámica:** Cada nuevo desafío o reenvío genera un código de 6 dígitos numérico aleatorio distinto (no se utiliza un valor fijo como 123456).
+- **Control "Ver código de prueba":** La tarjeta ofrece un botón accesible para alternar la visualización del código dinámico vigente (`••••••` &harr; código visible), permitiendo verificarlo de forma inmediata durante pruebas y demostraciones.
+- **Acción "Autocompletar":** Rellena exclusivamente las 6 casillas con el código activo y transfiere el foco al último dígito. **No inicia sesión automáticamente**, requiriendo pulsar "Verificar e ingresar" o presionar `Enter`.
 
-### 4. Flujo y Guion de Demostración
+### 4. Recorrido del Prototipo
 
-#### Fase 1: Inicio de Sesión (`inicio.html`)
-1. **Validaciones en tiempo real:**
-   - Si se presiona *Ingresar* con campos vacíos, se marcan en rojo y se muestran los mensajes de error correspondientes junto a cada campo.
-   - Si se escribe un correo con formato inválido (ej. `correo-invalido`), se informa la estructura requerida (`usuario@correo.com`).
-   - Si se ingresan credenciales que no coinciden con las cuentas demo, se despliega una alerta con mensaje genérico.
-2. **Visibilidad de contraseña:**
-   - El botón con icono de ojo permite alternar entre texto oculto (`password`) y visible (`text`).
-3. **Flujo de recuperación de contraseña:**
-   - Al pulsar *"¿Olvidaste tu contraseña?"*, se abre un diálogo modal informando de manera accesible que la recuperación por correo transaccional está en fase de desarrollo.
-   - **Alcance de cuentas y registro:** Por indicación de ingeniería, se retiró el registro público de usuarios y no se incluye la pantalla *"Crea tu cuenta"*. El acceso al sistema se realiza a través de las credenciales autorizadas asignadas (o mediante la selección simulada de cuentas en Google y Facebook).
-4. **Acceso social simulado (Google y Facebook):**
-   - Los botones *"Continuar con Google"* y *"Continuar con Facebook"* abren un modal explícitamente identificado como *"Simulación de acceso con [Google/Facebook]"*.
-   - No solicita contraseñas de dichos proveedores; permite seleccionar la cuenta de Asesor o Cliente para continuar al segundo factor o cancelar y regresar.
+#### Paso 1: Inicio de Sesión (`inicio.html`)
+1. **Opciones de acceso:**
+   - **Correo y contraseña:** Validación en tiempo real (campos requeridos, formato sintáctico y comprobación de credenciales autorizadas). Incluye botón funcional para alternar la visibilidad de la contraseña (`password` &harr; `text`).
+     - Al ingresar credenciales válidas (tanto para el Asesor como para el Cliente), el sistema avanza al **Paso 2: Verificación por Correo**.
+   - **Continuar con Google (Integración REAL con Firebase Authentication):**
+     - Al pulsar el botón oficial, se ejecuta `signInWithPopup(auth, googleProvider)` utilizando el SDK modular oficial de Firebase Authentication v10 (`https://www.gstatic.com/firebasejs/10.14.1/...`).
+     - Muestra un estado visual de carga (`Cargando...` con spinner) y previene pulsaciones simultáneas.
+     - Abre la ventana emergente real de Google Accounts con selección forzada de cuenta (`prompt: 'select_account'`).
+     - **Cancelación segura:** Si el usuario cierra el popup (`auth/popup-closed-by-user`), permanece en `inicio.html` sin crear sesión ni mostrar errores alarmantes.
+     - **Control de errores amigable:** Maneja dominios no autorizados (`auth/unauthorized-domain`), bloqueos de popup (`auth/popup-blocked`), fallos de red (`auth/network-request-failed`) y conflictos de credencial (`auth/account-exists-with-different-credential`), informando al usuario en lenguaje natural y permitiendo reintentar.
+     - **Acceso directo:** Tras autenticarse correctamente con Google, redirige directamente a `cliente.html` **sin mostrar verificación por correo de SHOWTECH**, sin códigos temporales ni temporizadores.
+     - **Identidad real de Google:** Extrae `uid`, `displayName`, `email` y `photoURL`. No concede en ningún caso rol de asesor.
+   - **Continuar con Facebook (Simulación interactiva local):**
+     - Conserva su diálogo interactivo local SHOWTECH con el cliente de demostración (*Promoción Horizonte 2026*).
+     - **Nota importante:** Facebook permanece estrictamente como una simulación local en frontend; no está conectado a Firebase Authentication ni se presenta como integración real.
+2. **Ausencia de registro público:** No se permite la creación arbitraria de cuentas ni el cambio en vuelo de correos; el acceso está restringido a las cuentas autorizadas.
+3. **Recuperación de contraseña:** Modal informativo indicando que el restablecimiento de contraseñas por correo transaccional se integrará en la fase de producción.
 
-#### Fase 2: Selección del Método de Verificación (2FA)
-Tras validar la cuenta ficticia, se presenta la pantalla con el identificador *"02 · Método de verificación"*:
-- Muestra el correo de la cuenta activa y la insignia discreta *"Verificación de demostración"*.
-- Permite seleccionar entre:
-  1. **Aplicación autenticadora:** *"Usa el código de tu aplicación."*
-  2. **Correo electrónico:** *"Recibe un código en tu correo registrado."*
-- Cuenta con el botón *"Continuar"* y el enlace *"Volver al inicio de sesión"*.
+#### Paso 2: Verificación por Correo ("Revisa tu correo")
+Aplica al acceso por correo y contraseña (Asesor y Cliente):
+- **Identificador de fase superior:** *"02 · Verificación por correo"*.
+- **Título y descripción:** *"Revisa tu correo"* e *"Ingresa el código de 6 dígitos para continuar."*
+- **Destino protegido:** Insignia que muestra el correo enmascarado procedente de la cuenta (`as***@showtech.com` o `cl***@horizonte.com`).
+- **Aviso discreto de evaluación:** Indicación de que se trata de un entorno de prototipo visual y no se despachan correos reales a casillas externas.
+- **Casillas de 6 dígitos:** Componente interactivo que soporta teclado numérico, avance automático, borrado con retroceso (`Backspace`), navegación con flechas y pegado directo del código completo.
+- **Gestión de reenvío:** Botón *"Reenviar código"* con temporizador de espera visible (30s). Al reenviar:
+  - Se genera un código dinámico nuevo.
+  - Se invalida de inmediato el código anterior.
+  - Se reinicia el temporizador de vigencia a 60s.
+  - Se limpian las casillas y se notifica con un mensaje tipo toast.
+- **Simulación de vencimiento:** Botón *"Simular vencimiento"* para agotar instantáneamente la vigencia y validar el estado de código expirado.
+- **Validaciones contempladas:**
+  - *Código incompleto:* Advertencia si se intenta verificar con menos de 6 dígitos.
+  - *Código vencido:* Advertencia de expiración invitando a solicitar un reenvío.
+  - *Código incorrecto:* Rechazo de códigos no coincidentes o códigos anteriores ya invalidados.
+  - *Prevención de dobles envíos:* Bloqueo de confirmación concurrente tras pulsar el botón principal.
+- **Enlace "Volver al inicio de sesión":** Permite regresar a la primera pantalla limpiando códigos, temporizadores y estados pendientes.
 
-#### Fase 3: Ingreso y Validación del Código de 6 Dígitos
-Identificada con *"03 · Confirmar acceso"*:
-- **Casillas de 6 dígitos:** Componente ergonómico que admite escritura con teclado numérico, avance automático al siguiente dígito, borrado retroactivo con `Backspace`, navegación con flechas y pegado directo del código completo desde el portapapeles.
-- **Diferenciación por método:**
-  - *Aplicación autenticadora:* Indica que el código se consulta en la aplicación vinculada. No muestra reenvíos ni afirma haber despachado correos.
-  - *Correo electrónico:* Muestra el correo ficticio parcialmente enmascarado e incluye el botón *"Reenviar código"* con temporizador de espera visible (30s) y aviso de reenvío simulado.
-- **Estados de validación contemplados:**
-  - *Código incompleto:* Alerta cuando se presiona verificar con menos de 6 dígitos.
-  - *Código incorrecto:* Alerta si los 6 dígitos no coinciden con `123456`.
-  - *Código vencido:* Temporizador de vigencia (60s) y botón *"Simular vencimiento"* para comprobar el mensaje de expiración y solicitar nuevo código.
-  - *Invalidación de desafío:* Reenviar el código o hacer clic en *"Usar otro método"* invalida el desafío anterior y limpia los campos y temporizadores.
+#### Finalización, Sesión y Cierre
+- **Fuente de verdad para Google:** En `cliente.html`, el observador `onAuthStateChanged(auth)` de Firebase Authentication es la única fuente de verdad para la sesión de Google.
+- **Persistencia de sesión:** Se encuentra configurada explícitamente como `browserSessionPersistence` en `firebase-init.js`.
+- **Separación estricta de identidades (Google vs. Cliente Ficticio):**
+  - La cuenta real de Google **no está vinculada por defecto a ningún cliente ficticio** (`CLI-001: Promoción Horizonte 2026`).
+  - No se asignan automáticamente los eventos (`EVT-001`), cotizaciones ni solicitudes del cliente de prueba a la cuenta de Google.
+  - Si la cuenta de Google no tiene un cliente vinculado en el sistema, entra al portal en un **estado vacío seguro:** *"No tienes eventos vinculados a esta cuenta"*, con mensaje orientativo para contactar al asesor comercial.
+  - **Aclaración de negocio:** Autenticarse exitosamente con Google verifica únicamente la identidad federada del usuario, pero **no resuelve por sí sola la autorización comercial ni la vinculación con reservas o contratos existentes** en el sistema de SHOWTECH.
+  - Los eventos ficticios continúan disponibles exclusivamente dentro del recorrido del cliente de demostración (acceso con contraseña o Facebook local).
+- **Cierre de sesión:**
+  - Al pulsar "Cerrar sesión" en `cliente.html`, se ejecuta `signOut(auth)` en Firebase Authentication y se limpian las claves auxiliares de `sessionStorage`.
+  - Evita restaurar automáticamente la sesión de Google tras cerrar sesión.
+- **Integridad de datos de negocio:** Los eventos, adicionales, solicitudes y pagos almacenados en `localStorage` no se modifican, eliminan ni migran.
 
-#### Fase 4: Finalización y Navegación
-- Tras ingresar `123456`, el sistema redirige automáticamente a la vista asociada al rol:
-  - Cuenta Asesor &rarr; `index.html`.
-  - Cuenta Cliente &rarr; `cliente.html`.
-- Se registra el estado de acceso exclusivamente en `sessionStorage` (`showtech_demo_session`).
-- **Botón "Cerrar sesión":** Se encuentra visible en la barra superior de `index.html` y `cliente.html`. Al pulsarlo, se elimina el estado de sesión en `sessionStorage` y se regresa a `inicio.html`.
-- **Conservación absoluta de datos:** El cierre de sesión no borra ningún evento, solicitud o modificación guardada en `localStorage`.
-- **Ausencia de parpadeo (flicker):** La sincronización de sesión se ejecuta de forma síncrona en el renderizado sin ocultar el contenido ni generar saltos visuales.
+### 5. Configuración Externa de Firebase Authentication
 
-### 5. Integraciones Pendientes para un Entorno de Producción Real
-Este desarrollo corresponde a una entrega de demostración de interfaz de usuario. En una arquitectura de producción deberán incorporarse las siguientes integraciones reales:
+Para que el popup de Google funcione sin errores de dominio no autorizado (`auth/unauthorized-domain`), deben estar registrados los siguientes dominios en Firebase Console:
 
-1. **Protocolo OAuth 2.0 / OpenID Connect:** Integración real con Google Identity Services y Facebook Login SDK mediante tokens criptográficos (JWT) y validación en backend.
-2. **Generador TOTP (RFC 6238):** Servicio de autenticación TOTP con clave secreta compartida y código QR para emparejamiento con Google Authenticator o Microsoft Authenticator.
-3. **Servicio SMTP / API Transaccional:** Integración con proveedores de correo transaccional (ej. SendGrid, Amazon SES) para despacho de códigos OTP con expiración estricta y protección antifraude.
-4. **Protección contra ataques de fuerza bruta:** Limitador de tasa (*Rate limiting*), bloqueo temporal tras intentos fallidos y reCAPTCHA / Cloudflare Turnstile.
-5. **Sesiones Seguras en Servidor:** Almacenamiento de tokens en cookies seguras con directivas `HttpOnly`, `Secure` y `SameSite=Strict`. Las redirecciones y validaciones en navegador no constituyen por sí mismas una barrera de seguridad de datos.
+- `localhost`
+- `cristhoferasm.github.io`
+
+*(Registrar sin protocolo `http://`/`https://` y sin subrutas `/gestor-eventos/`)*.
+
+#### Ruta exacta para configurarlo en Firebase Console:
+1. Inicie sesión en [Firebase Console](https://console.firebase.google.com/).
+2. Seleccione el proyecto: **showtech-prototipo**.
+3. En el menú de navegación lateral izquierdo, diríjase a **Build (Compilación)** &rarr; **Authentication**.
+4. Haga clic en la pestaña superior **Settings (Configuración)**.
+5. En la sección **Authorized domains (Dominios autorizados)**, revise la lista.
+6. Si falta alguno de los dos dominios, haga clic en **Add domain (Agregar dominio)**, ingrese el nombre del dominio (`localhost` o `cristhoferasm.github.io`) y confirme en **Save (Guardar)**.
 
 

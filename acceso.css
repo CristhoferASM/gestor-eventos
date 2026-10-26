@@ -453,151 +453,60 @@ main.acceso-principal {
   flex-shrink: 0;
 }
 
-/* ===== PASO 2: SELECCIÓN DE MÉTODO 2FA ===== */
-.badge-demo {
+.spinner-sm {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(19, 38, 74, 0.2);
+  border-top-color: var(--primario);
+  border-radius: 50%;
+  animation: girarSpinner 0.8s linear infinite;
   display: inline-block;
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fde68a;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  text-align: center;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
-.badge-demo-wrap {
-  text-align: center;
+@keyframes girarSpinner {
+  to { transform: rotate(360deg); }
 }
 
-.resumen-cuenta-activa {
-  background: #f8fafc;
+/* ===== PASO 2: VERIFICACIÓN POR CORREO ELECTRÓNICO ===== */
+.destino-correo-badge {
+  background: #f1f5f9;
   border: 1px solid var(--borde);
   border-radius: 6px;
   padding: 8px 12px;
-  margin-bottom: 16px;
-  font-size: 12.5px;
+  margin-bottom: 10px;
+  font-size: 13px;
   color: var(--texto);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 6px;
 }
 
-.resumen-cuenta-activa strong {
+.destino-correo-badge strong {
   color: var(--primario);
-}
-
-.opciones-2fa-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.opcion-2fa-item {
-  border: 1.5px solid var(--borde);
-  border-radius: 8px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  background: var(--blanco);
-  transition: all 0.15s ease;
-  user-select: none;
-}
-
-.opcion-2fa-item:hover {
-  border-color: #cbd5e1;
-  background: #fbfcfe;
-}
-
-.opcion-2fa-item.seleccionada {
-  border-color: var(--primario-2);
-  background: #f4f7fd;
-}
-
-.opcion-2fa-radio {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #94a3b8;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-
-.opcion-2fa-item.seleccionada .opcion-2fa-radio {
-  border-color: var(--primario-2);
-}
-
-.opcion-2fa-radio-punto {
-  width: 8px;
-  height: 8px;
-  background: transparent;
-  border-radius: 50%;
-  transition: background 0.15s;
-}
-
-.opcion-2fa-item.seleccionada .opcion-2fa-radio-punto {
-  background: var(--primario-2);
-}
-
-.opcion-2fa-icono {
-  color: var(--primario-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.opcion-2fa-icono svg {
-  width: 24px;
-  height: 24px;
-}
-
-.opcion-2fa-textos {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.opcion-2fa-titulo {
-  font-size: 14px;
   font-weight: 700;
-  color: var(--primario);
 }
 
-.opcion-2fa-desc {
-  font-size: 12.5px;
+.aviso-simulacion-discreto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
   color: var(--gris);
-}
-
-.link-volver-wrap {
+  background: #f8fafc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 14px;
+  border: 1px dashed var(--borde);
   text-align: center;
-  margin-top: 16px;
 }
 
-.link-volver-login {
+.aviso-simulacion-discreto svg {
   color: var(--primario-2);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.link-volver-login:hover {
-  text-decoration: underline;
-}
-
-/* ===== PASO 3: INGRESO DE CÓDIGO ===== */
-.email-enmascarado-badge {
-  display: block;
-  font-weight: 700;
-  color: var(--primario);
-  margin-top: 4px;
+  flex-shrink: 0;
 }
 
 /* Ayuda de código de prueba */
@@ -615,9 +524,44 @@ main.acceso-principal {
   color: #1e40af;
 }
 
-.ayuda-codigo-demo strong {
-  font-size: 13px;
-  letter-spacing: 1px;
+.ayuda-codigo-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ayuda-codigo-lbl {
+  font-weight: 500;
+}
+
+.codigo-prueba-valor {
+  font-family: monospace;
+  font-size: 13.5px;
+  letter-spacing: 1.5px;
+  color: var(--primario);
+  background: #dbeafe;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 58px;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-ver-codigo {
+  background: transparent;
+  border: none;
+  color: var(--primario-2);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+}
+
+.btn-ver-codigo:hover {
+  color: var(--primario);
 }
 
 .btn-autollenar-codigo {
@@ -635,6 +579,22 @@ main.acceso-principal {
 
 .btn-autollenar-codigo:hover {
   background: var(--primario);
+}
+
+.link-volver-wrap {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.link-volver-login {
+  color: var(--primario-2);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.link-volver-login:hover {
+  text-decoration: underline;
 }
 
 /* 6 Casillas de Código */
@@ -894,6 +854,13 @@ footer.acceso-pie-pagina {
 .item-cuenta-social:hover {
   border-color: var(--primario-2);
   background: #f8fafc;
+}
+
+.item-cuenta-social:focus,
+.item-cuenta-social:focus-visible {
+  outline: none;
+  border-color: var(--primario-2);
+  box-shadow: 0 0 0 3px rgba(31, 78, 156, 0.18);
 }
 
 .item-cuenta-social.seleccionado {

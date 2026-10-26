@@ -26,6 +26,9 @@
     email: 'm.rodriguez@horizonte2026.edu'
   };
 
+  let clienteActivo = null; // null cuando es Google sin vincular; CLIENTE_ACTUAL para mock
+  let authInfoActual = null;
+
   const REGULAR_HOURS = {
     START_MINUTES: 6 * 60,   // 06:00
     END_MINUTES: 22 * 60     // 22:00
@@ -785,15 +788,19 @@
   }
 
   function getEventosDelCliente() {
+    if (!clienteActivo) {
+      return []; // Cuenta Google no vinculada: sin eventos
+    }
     return eventsData.filter(ev => {
-      if (ev.clientId === CLIENTE_ACTUAL.id) return true;
-      if (ev.client && ev.client.trim().toLowerCase() === CLIENTE_ACTUAL.razonSocial.toLowerCase()) return true;
+      if (ev.clientId === clienteActivo.id) return true;
+      if (ev.client && ev.client.trim().toLowerCase() === clienteActivo.razonSocial.toLowerCase()) return true;
       return false;
     });
   }
 
   function getCurrentEvent() {
-    return eventsData.find(e => e.id === currentEventId) || eventsData[0];
+    const evs = getEventosDelCliente();
+    return eventsData.find(e => e.id === currentEventId) || evs[0] || null;
   }
 
   function getSolicitudPendienteEvento(eventId) {
@@ -1265,6 +1272,11 @@
   // 8. Navegación en Cuatro Pasos del Cliente
   // =========================================================================
   function irPasoCliente(n) {
+    if (n > 1 && !clienteActivo) {
+      mostrarToastCliente('No tienes eventos vinculados para proponer modificaciones.', 'alerta');
+      return;
+    }
+
     if (pasoActual === 2 && n > 2) {
       const err = validarFormularioPaso2();
       if (err) {
@@ -1322,11 +1334,42 @@
     if (!cont) return;
 
     if (eventos.length === 0) {
+      if (!clienteActivo && authInfoActual && authInfoActual.tipo === 'google') {
+        const emailG = (authInfoActual.user && authInfoActual.user.email) ? authInfoActual.user.email : 'tu cuenta de Google';
+        cont.innerHTML = `
+          <div class="tarjeta-estado-vacio">
+            <div class="icono-estado-vacio" aria-hidden="true">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <h3 style="margin-bottom: 8px; color: var(--primario);">No tienes eventos vinculados a esta cuenta</h3>
+            <p style="color: var(--gris); font-size: 13.5px; max-width: 520px; margin: 0 auto 16px; line-height: 1.5;">
+              Has iniciado sesión con tu cuenta de Google (<strong>${escapeHtml(emailG)}</strong>). Esta cuenta aún no tiene contratos ni eventos registrados en el sistema de Showtech Solutions.
+            </p>
+            <div class="aviso-vinculo-pendiente" style="display: inline-flex; align-items: center; gap: 8px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px 16px; border-radius: 6px; font-size: 12.5px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Para asociar tu cuenta con una reserva existente, contacta a tu asesor comercial.</span>
+            </div>
+          </div>
+        `;
+        renderSolicitudesCliente();
+        return;
+      }
+
       cont.innerHTML = `
         <div class="aviso aviso-info">
-          No cuenta con eventos registrados bajo el cliente <strong>${escapeHtml(CLIENTE_ACTUAL.razonSocial)}</strong>.
+          No cuenta con eventos registrados bajo el cliente <strong>${escapeHtml(clienteActivo ? clienteActivo.razonSocial : '')}</strong>.
         </div>
       `;
+      renderSolicitudesCliente();
       return;
     }
 
@@ -1417,8 +1460,15 @@
     const cont = dom.contenedorSolicitudesCliente;
     if (!cont) return;
 
+    if (!clienteActivo) {
+      cont.innerHTML = `
+        <p class="ayuda" style="margin-top: 8px;">No hay solicitudes de modificación registradas para esta cuenta.</p>
+      `;
+      return;
+    }
+
     // Filtrar solicitudes del cliente actual
-    const misSolicitudes = solicitudesData.filter(s => s.clientId === CLIENTE_ACTUAL.id || s.clientName === CLIENTE_ACTUAL.razonSocial);
+    const misSolicitudes = solicitudesData.filter(s => s.clientId === clienteActivo.id || s.clientName === clienteActivo.razonSocial);
 
     if (misSolicitudes.length === 0) {
       cont.innerHTML = `
@@ -2512,9 +2562,19 @@
   }
 
   // =========================================================================
-  // 15. Arranque Inicial
+  // 15. Arranque Inicial e Inyección de Identidad
   // =========================================================================
-  function iniciar() {
+  let domListo = false;
+  let authPendiente = null;
+
+  function iniciarConIdentidad(authInfo) {
+    authInfoActual = authInfo;
+    if (authInfo && authInfo.tipo === 'mock') {
+      clienteActivo = CLIENTE_ACTUAL;
+    } else {
+      clienteActivo = null; // Cuenta Google no vinculada
+    }
+
     loadStorage();
     initFlatpickrDatePickers();
     initFlatpickrTimePickers();
@@ -2523,10 +2583,26 @@
     irPasoCliente(1);
   }
 
+  window.configurarIdentidadClientePortal = function (authInfo) {
+    if (!domListo) {
+      authPendiente = authInfo;
+      return;
+    }
+    iniciarConIdentidad(authInfo);
+  };
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', iniciar);
+    document.addEventListener('DOMContentLoaded', () => {
+      domListo = true;
+      if (authPendiente) {
+        iniciarConIdentidad(authPendiente);
+      }
+    });
   } else {
-    iniciar();
+    domListo = true;
+    if (authPendiente) {
+      iniciarConIdentidad(authPendiente);
+    }
   }
 
 })();
